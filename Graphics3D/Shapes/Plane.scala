@@ -1,0 +1,28 @@
+package Graphics3D.Shapes
+
+import Graphics3D.BaseObjects._
+import Graphics3D.{Vec3, origin, unitY}
+
+class Plane(val point: Vec3 = origin, val normal: Vec3 = unitY, material: Material)
+  extends Shape(material) with RTShape with RMShape {
+
+  private val planeBias = point dot normal
+
+  override def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit] = {
+    val normalDotDir = normal dot direction
+    if (normalDotDir == 0)
+      None
+    else {
+      val dist = (planeBias - (normal dot origin)) / normalDotDir
+      if (dist < 0)
+        None
+      else {
+        val hitPoint = origin + direction * dist
+        Some(RayHit(dist, hitPoint, normal, material))
+      }
+    }
+  }
+
+  override def getNormal(point: Vec3): Vec3 = normal
+  override def getDistance(point: Vec3): Double = (normal dot point) - planeBias
+}
