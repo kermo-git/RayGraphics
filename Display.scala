@@ -26,7 +26,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    val image: BufferedImage = sceneToImage(Scenes.test)
+    val image: BufferedImage = sceneToImage(Scenes.insideBox)
     val frame = new JFrame
     frame.setTitle("3D Graphics")
     frame.setSize(image.getWidth, image.getHeight)

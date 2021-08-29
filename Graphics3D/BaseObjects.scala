@@ -1,8 +1,6 @@
 package Graphics3D
 
-import Graphics3D.Colors._
-import Graphics3D.Config._
-import Graphics3D.Utils._
+import Colors._, Utils._
 
 import scala.math.{tan, toRadians}
 
@@ -15,6 +13,11 @@ object BaseObjects {
     val imageWidth: Int,
     val imageHeight: Int,
     val FOVDegrees: Int,
+
+    val maxBounces: Int,
+    val rayHitBias: Double,
+    val renderShadows: Boolean,
+
     val lights: List[Light],
     val shapes: List[S]
   ) {
@@ -69,6 +72,7 @@ object BaseObjects {
   trait RMShape extends Shape {
     def getDistance(point: Vec3): Double
 
+    private val GRADIENT_EPSILON = 0.001
     private val eX = Vec3(GRADIENT_EPSILON, 0, 0)
     private val eY = Vec3(0, GRADIENT_EPSILON, 0)
     private val eZ = Vec3(0, 0, GRADIENT_EPSILON)

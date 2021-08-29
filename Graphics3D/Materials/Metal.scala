@@ -2,28 +2,47 @@ package Graphics3D.Materials
 
 import Graphics3D.BaseObjects._
 import Graphics3D.Colors._
-import Graphics3D.Config._
 import Graphics3D.Utils._
 
-case class Metal(override val diffuse: Color,
-                 override val specular: Color = WHITE,
-                 override val shininess: Double = 0.5 * 128,
+import scala.math.pow
+
+case class Metal(diffuse: Color,
+                 specular: Color = WHITE,
+                 shininess: Double = 0.5 * 128,
                  ior: Double = 1.3,
-                 reflectivity: Double = 0) extends Matte(diffuse, specular, shininess) {
+                 reflectivity: Double = 0) extends Material {
+
+  private val ambient = diffuse * 0.1
 
   override def shade[O <: Shape](
     scene: Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
   ): Color = {
+    val biasedHitPoint = hitPoint + normal * scene.rayHitBias
 
-    val _normal = if ((incident dot normal) > 0) normal.invert else normal
-    val diffuseColor = super.shade(scene, incident, hitPoint, normal, depth, inside)
+    def addLight(color: Color, light: Light): Color = {
+      val shadow = if (scene.renderShadows) scene.getShadow(biasedHitPoint, light) else 1
+      if (shadow > 0) {
 
-    if (depth < MAX_RECURSION_DEPTH) {
-      val cos = -(incident dot _normal)
+        val lightVec = new Vec3(light.location, hitPoint).normalize
+        val diffuseIntensity = -(lightVec dot normal)
+
+        if (diffuseIntensity > 0) {
+          val diffuseColor = diffuse * light.color * diffuseIntensity * shadow
+
+          val specularIntensity = pow(reflection(lightVec, normal) dot incident, shininess)
+          if (specularIntensity > 0)
+            color + diffuseColor + (specular * light.color * specularIntensity * shadow)
+          else
+            color + diffuseColor
+        } else color
+      } else color
+    }
+    val diffuseColor = scene.lights.foldLeft(ambient)(addLight)
+
+    if (depth < scene.maxBounces) {
+      val cos = -(incident dot normal)
       val reflectionRatio = reflectivity + (1 - reflectivity) * schlick(1, ior, cos)
-
-      val reflectedRay = reflection(incident, _normal)
-      val reflectionColor = scene.castRay(hitPoint + _normal * RAY_HIT_BIAS, reflectedRay, depth + 1)
+      val reflectionColor = scene.castRay(biasedHitPoint, reflection(incident, normal), depth + 1)
 
       diffuseColor * (1 - reflectionRatio) + reflectionColor * reflectionRatio
     }

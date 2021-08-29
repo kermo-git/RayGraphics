@@ -1,9 +1,6 @@
 package Graphics3D
 
-import Graphics3D.BaseObjects._
-import Graphics3D.Colors._
-import Graphics3D.Config._
-import Graphics3D.Utils._
+import BaseObjects._, Colors._, Utils._
 
 import scala.annotation.tailrec
 import scala.math.{abs, min}
@@ -12,57 +9,75 @@ class RayMarchingScene(
   imageWidth: Int,
   imageHeight: Int,
   FOVDegrees: Int = 70,
+
+  maxBounces: Int = 5,
+  rayHitBias: Double = 0.005,
+  renderShadows: Boolean = true,
+
+  val maxDist: Double = 100,
+  val rayHitThreshold: Double = 0.001,
+  val softShadows: Boolean = false,
+
   lights: List[Light],
   shapes: List[RMShape]
-) extends Scene[RMShape](imageWidth, imageHeight, FOVDegrees, lights, shapes) {
+) extends Scene[RMShape](imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights, shapes) {
 
   type DistInfo = Option[(RMShape, Double)]
   type HitPointInfo = Option[(RMShape, Vec3)]
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
-    doRayMarching(origin, direction) match {
+
+    @tailrec
+    def findHitPoint(traveledDist: Double = 0): HitPointInfo = {
+      if (traveledDist > maxDist) None
+      else {
+        val currentPos = origin + direction * traveledDist
+        findClosestObject(currentPos, shapes) match {
+          case Some((shape, distance)) =>
+            if (distance < rayHitThreshold)
+              Some((shape, currentPos))
+            else
+              findHitPoint(traveledDist + distance)
+          case None => None
+        }
+      }
+    }
+
+    findHitPoint() match {
       case Some((shape, hitPoint)) =>
-        shape.material.shade(this, direction, hitPoint, shape.getNormal(hitPoint), depth, inside)
+        val normal = shape.getNormal(hitPoint)
+        val trueNormal = if ((direction dot normal) > 0) normal.invert else normal
+        shape.material.shade(this, direction, hitPoint, trueNormal, depth, inside)
       case None => BLACK
     }
   }
 
   override def getShadow(point: Vec3, light: Light): Double = {
     val pointToLight = new Vec3(point, light.location)
-    val totalDist = pointToLight.length
+    val distToLight = pointToLight.length
     val direction = pointToLight.normalize
 
     @tailrec
-    def doShadowRayMarching(currentPos: Vec3, traveledDist: Double = 0, shadowValue: Double = 1): Double = {
-      if (traveledDist > totalDist) shadowValue
+    def doShadowRayMarching(traveledDist: Double = 0, shadowValue: Double = 1): Double = {
+      if (traveledDist > distToLight) shadowValue
       else {
+        val currentPos = point + direction * traveledDist
         findClosestObject(currentPos, shapes) match {
           case Some((_, objDist)) =>
-            if (objDist < RAY_HIT_THRESHOLD) 0
-            else {
-              val nextShadowValue = min(shadowValue, light.shadowSharpness * objDist / traveledDist)
-              doShadowRayMarching(currentPos + direction * objDist, traveledDist + objDist, nextShadowValue)
-            }
+            if (objDist < rayHitThreshold) 0
+            else doShadowRayMarching(
+              traveledDist = traveledDist + objDist,
+
+              shadowValue = if (softShadows)
+                min(shadowValue, light.shadowSharpness * objDist / traveledDist)
+              else
+                shadowValue
+            )
           case None => shadowValue
         }
       }
     }
-    doShadowRayMarching(point + direction * RAY_HIT_BIAS)
-  }
-
-  @tailrec
-  private def doRayMarching(origin: Vec3, direction: Vec3, traveledDist: Double = 0): HitPointInfo = {
-    if (traveledDist > MAX_DIST) None
-    else {
-      findClosestObject(origin, shapes) match {
-        case Some((shape, distance)) =>
-          if (distance < RAY_HIT_THRESHOLD)
-            Some((shape, origin))
-          else
-            doRayMarching(origin + direction * distance, direction, traveledDist + distance)
-        case None => None
-      }
-    }
+    doShadowRayMarching()
   }
 
   @tailrec
@@ -71,7 +86,7 @@ class RayMarchingScene(
       val nextDist = abs(shape.getDistance(viewPoint))
       val nextResult = Some((shape, nextDist))
 
-      if (nextDist < RAY_HIT_THRESHOLD)
+      if (nextDist < rayHitThreshold)
         nextResult
       else {
         val nextClosest = prevClosest match {
