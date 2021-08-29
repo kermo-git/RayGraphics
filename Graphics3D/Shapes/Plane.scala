@@ -1,10 +1,10 @@
 package Graphics3D.Shapes
 
 import Graphics3D.BaseObjects._
-import Graphics3D.{Vec3, origin, unitY}
+import Graphics3D.Utils._
 
-class Plane(val point: Vec3 = origin, val normal: Vec3 = unitY, material: Material)
-  extends Shape(material) with RTShape with RMShape {
+case class Plane(point: Vec3 = origin, normal: Vec3 = unitY,
+                 override val material: Material) extends Shape(material) with RTShape with RMShape {
 
   private val planeBias = point dot normal
 

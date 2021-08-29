@@ -1,12 +1,15 @@
 package Graphics3D.Materials
 
 import Graphics3D.BaseObjects._
+import Graphics3D.Colors._
 import Graphics3D.Config._
-import Graphics3D._
+import Graphics3D.Utils._
 
-class Metal(diffuse: Color, specular: Color = WHITE,
-            shininess: Double = 0.5 * 128, val ior: Double = 1.3,
-            val reflectivity: Double = 0) extends Matte(diffuse, specular, shininess) {
+case class Metal(override val diffuse: Color,
+                 override val specular: Color = WHITE,
+                 override val shininess: Double = 0.5 * 128,
+                 ior: Double = 1.3,
+                 reflectivity: Double = 0) extends Matte(diffuse, specular, shininess) {
 
   override def shade[O <: Shape](
     scene: Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean

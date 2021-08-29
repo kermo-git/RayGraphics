@@ -1,11 +1,13 @@
 package Graphics3D.Shapes
 
-import scala.math.{min, sqrt}
 import Graphics3D.BaseObjects._
-import Graphics3D._
+import Graphics3D.Utils._
 
-class Cone(val height: Double, val radius: Double, pos: Position, material: Material)
-  extends Shape(material, pos) with OriginRTShape with OriginRMShape {
+import scala.math.{min, sqrt}
+
+case class Cone(height: Double, radius: Double,
+                override val pos: Position,
+                override val material: Material) extends Shape(material, pos) with OriginRTShape with OriginRMShape {
 
   private val hSqr_div_rSqr = (height * height) / (radius * radius)
   private val _2h = 2 * height

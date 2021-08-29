@@ -1,11 +1,13 @@
 package Graphics3D.Shapes
 
-import scala.math.{abs, max, sqrt}
 import Graphics3D.BaseObjects._
-import Graphics3D._
+import Graphics3D.Utils._
 
-class Box(val lenX: Double, val lenY: Double, val lenZ: Double, pos: Position, material: Material)
-  extends Shape(material, pos) with OriginRTShape with OriginRMShape {
+import scala.math.{abs, max, sqrt}
+
+case class Box(lenX: Double, lenY: Double, lenZ: Double,
+               override val pos: Position,
+               override val material: Material) extends Shape(material, pos) with OriginRTShape with OriginRMShape {
 
   def this(sideLength: Double, pos: Position, material: Material) {
     this(sideLength, sideLength, sideLength, pos, material)

@@ -1,24 +1,31 @@
 package Graphics3D
 
-import scala.math.{tan, toRadians}
+import Graphics3D.Colors._
 import Graphics3D.Config._
+import Graphics3D.Utils._
+
+import scala.math.{tan, toRadians}
 
 object BaseObjects {
   case class Light(x: Double, y: Double, z: Double, color: Color = WHITE, shadowSharpness: Int = 20) {
     val location: Vec3 = Vec3(x, y, z)
   }
 
-  abstract class Scene[S <: Shape](val lights: List[Light], val shapes: List[S]) {
-    private val screenWidth = 2 * tan(toRadians(FOV_DEGREES / 2))
-    private val screenHeight = screenWidth * NUM_PIXELS_Y / NUM_PIXELS_X
+  abstract class Scene[S <: Shape](
+    val imageWidth: Int,
+    val imageHeight: Int,
+    val FOVDegrees: Int,
+    val lights: List[Light],
+    val shapes: List[S]
+  ) {
+    private val screenWidth = 2 * tan(toRadians(FOVDegrees / 2))
+    private val screenHeight = screenWidth * imageHeight / imageWidth
     private val halfScreenWidth = 0.5 * screenWidth
     private val halfScreenHeight = 0.5 * screenHeight
 
-    def render(initImage: (Int, Int) => Unit, setPixelColor: (Int, Int, Color) => Unit): Unit = {
-      initImage(NUM_PIXELS_X, NUM_PIXELS_Y)
-
-      for (x <- 0 until NUM_PIXELS_X) {
-        for (y <- 0 until NUM_PIXELS_Y) {
+    def render(setPixelColor: (Int, Int, Color) => Unit): Unit = {
+      for (x <- 0 until imageWidth) {
+        for (y <- 0 until imageHeight) {
           setPixelColor(x, y, getPixelColor(x, y))
         }
       }
@@ -26,8 +33,8 @@ object BaseObjects {
     def getPixelColor(x: Int, y: Int): Color = castRay(origin, getCameraRay(x, y))
 
     def getCameraRay(x: Int, y: Int): Vec3 = {
-      val _x = (screenWidth * x / NUM_PIXELS_X) - halfScreenWidth
-      val _y = (screenHeight - screenHeight * y / NUM_PIXELS_Y) - halfScreenHeight
+      val _x = (screenWidth * x / imageWidth) - halfScreenWidth
+      val _y = (screenHeight - screenHeight * y / imageHeight) - halfScreenHeight
       Vec3(_x, _y, 1).normalize
     }
 

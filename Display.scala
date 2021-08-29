@@ -1,10 +1,10 @@
-import Graphics3D.BaseObjects.{Scene, Shape}
-
 import java.awt.image.BufferedImage
 import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
-import Graphics3D.Color
+
+import Graphics3D.BaseObjects.{Scene, Shape}
+import Graphics3D.Colors._
 
 class Display(val image: BufferedImage) extends JPanel {
   override def paint(g: Graphics): Unit = {
@@ -14,19 +14,12 @@ class Display(val image: BufferedImage) extends JPanel {
 
 object Main {
   def sceneToImage[O <: Shape](scene: Scene[O]): BufferedImage = {
-    var image: BufferedImage = null
-
-    def initImage(numPixelsX: Int, numPixelsY: Int): Unit = {
-      image = new BufferedImage(
-        numPixelsX,
-        numPixelsY,
-        BufferedImage.TYPE_INT_RGB
-      )
-    }
-    def setPixelColor(x: Int, y: Int, color: Color): Unit = {
-      image.setRGB(x, y, color.toHex)
-    }
-    scene.render(initImage, setPixelColor)
+    val image: BufferedImage = new BufferedImage(
+      scene.imageWidth,
+      scene.imageHeight,
+      BufferedImage.TYPE_INT_RGB
+    )
+    scene.render((x: Int, y: Int, color: Color) => image.setRGB(x, y, color.toHex))
     image
   }
 

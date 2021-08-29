@@ -1,11 +1,13 @@
 package Graphics3D.Shapes
 
-import scala.math.{abs, sqrt}
 import Graphics3D.BaseObjects._
-import Graphics3D._
+import Graphics3D.Utils._
 
-class Cylinder(val height: Double, val radius: Double, pos: Position, material: Material)
-  extends Shape(material, pos) with OriginRTShape with OriginRMShape {
+import scala.math.{abs, sqrt}
+
+case class Cylinder(height: Double, radius: Double,
+                    override val pos: Position,
+                    override val material: Material) extends Shape(material, pos) with OriginRTShape with OriginRMShape {
 
   private val rSqr = radius * radius
   private val rRec = 1 / radius

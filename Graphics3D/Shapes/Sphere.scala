@@ -1,12 +1,11 @@
 package Graphics3D.Shapes
 
 import Graphics3D.BaseObjects._
-import Graphics3D.{Vec3, solveQuadraticEquation}
+import Graphics3D.Utils._
 
-class Sphere(Cx: Double, Cy: Double, Cz: Double, radius: Double = 1, material: Material)
-  extends Shape(material) with RMShape with RTShape {
+case class Sphere(center: Vec3, radius: Double,
+                  override val material: Material) extends Shape(material) with RMShape with RTShape {
 
-  val center: Vec3 = Vec3(Cx, Cy, Cz)
   val equationConst: Double = (center dot center) - radius * radius
 
   override def getDistance(point: Vec3): Double = new Vec3(center, point).length - radius

@@ -1,11 +1,21 @@
 package Graphics3D
 
-import scala.math.abs
-import scala.annotation.tailrec
 import Graphics3D.BaseObjects._
-import Graphics3D.Config.{MAX_DIST, RAY_HIT_BIAS, RAY_HIT_THRESHOLD}
+import Graphics3D.Colors._
+import Graphics3D.Config._
+import Graphics3D.Utils._
 
-class RayMarchingScene(lights: List[Light], shapes: List[RMShape]) extends Scene[RMShape](lights, shapes) {
+import scala.annotation.tailrec
+import scala.math.{abs, min}
+
+class RayMarchingScene(
+  imageWidth: Int,
+  imageHeight: Int,
+  FOVDegrees: Int = 70,
+  lights: List[Light],
+  shapes: List[RMShape]
+) extends Scene[RMShape](imageWidth, imageHeight, FOVDegrees, lights, shapes) {
+
   type DistInfo = Option[(RMShape, Double)]
   type HitPointInfo = Option[(RMShape, Vec3)]
 
@@ -19,9 +29,25 @@ class RayMarchingScene(lights: List[Light], shapes: List[RMShape]) extends Scene
 
   override def getShadow(point: Vec3, light: Light): Double = {
     val pointToLight = new Vec3(point, light.location)
-    val distToLight = pointToLight.length
+    val totalDist = pointToLight.length
     val direction = pointToLight.normalize
-    doShadowRayMarching(point + direction * RAY_HIT_BIAS, direction, distToLight)
+
+    @tailrec
+    def doShadowRayMarching(currentPos: Vec3, traveledDist: Double = 0, shadowValue: Double = 1): Double = {
+      if (traveledDist > totalDist) shadowValue
+      else {
+        findClosestObject(currentPos, shapes) match {
+          case Some((_, objDist)) =>
+            if (objDist < RAY_HIT_THRESHOLD) 0
+            else {
+              val nextShadowValue = min(shadowValue, light.shadowSharpness * objDist / traveledDist)
+              doShadowRayMarching(currentPos + direction * objDist, traveledDist + objDist, nextShadowValue)
+            }
+          case None => shadowValue
+        }
+      }
+    }
+    doShadowRayMarching(point + direction * RAY_HIT_BIAS)
   }
 
   @tailrec
@@ -35,21 +61,6 @@ class RayMarchingScene(lights: List[Light], shapes: List[RMShape]) extends Scene
           else
             doRayMarching(origin + direction * distance, direction, traveledDist + distance)
         case None => None
-      }
-    }
-  }
-
-  @tailrec
-  private def doShadowRayMarching(origin: Vec3, direction: Vec3, distToLight: Double, traveledDist: Double = 0): Double = {
-    if (traveledDist > distToLight) 1
-    else {
-      findClosestObject(origin, shapes) match {
-        case Some((_, distance)) =>
-          if (distance < RAY_HIT_THRESHOLD)
-            0
-          else
-            doShadowRayMarching(origin + direction * distance, direction, traveledDist + distance, distToLight)
-        case None => 1
       }
     }
   }

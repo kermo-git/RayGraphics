@@ -1,13 +1,14 @@
 package Graphics3D.Materials
 
-import Graphics3D.BaseObjects.Material
-import Graphics3D.Config.{MAX_RECURSION_DEPTH, RAY_HIT_BIAS}
-import Graphics3D._
+import Graphics3D.BaseObjects._
+import Graphics3D.Colors._
+import Graphics3D.Config._
+import Graphics3D.Utils._
 
-class Glass(val color: Color = WHITE, val ior: Double = 1.5, val reflectivity: Double = 0) extends Material {
+case class Glass(color: Color = WHITE, ior: Double = 1.5, reflectivity: Double = 0) extends Material {
 
-  override def shade[O <: BaseObjects.Shape](
-    scene: BaseObjects.Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean
+  override def shade[O <: Shape](
+    scene: Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean
   ): Color = {
 
     if (recDepth > MAX_RECURSION_DEPTH) BLACK

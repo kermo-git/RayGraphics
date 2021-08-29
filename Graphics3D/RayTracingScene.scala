@@ -1,10 +1,19 @@
 package Graphics3D
 
-import scala.annotation.tailrec
 import Graphics3D.BaseObjects._
-import Graphics3D.Config.RAY_HIT_BIAS
+import Graphics3D.Colors._
+import Graphics3D.Config._
+import Graphics3D.Utils._
 
-class RayTracingScene(lights: List[Light], shapes: List[RTShape]) extends Scene[RTShape](lights, shapes) {
+import scala.annotation.tailrec
+
+class RayTracingScene(
+  imageWidth: Int,
+  imageHeight: Int,
+  FOVDegrees: Int = 70,
+  lights: List[Light],
+  shapes: List[RTShape]
+) extends Scene[RTShape](imageWidth, imageHeight, FOVDegrees, lights, shapes) {
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
     def testNextShape(prevHit: Option[RayHit], nextShape: RTShape): Option[RayHit] = {
@@ -29,17 +38,17 @@ class RayTracingScene(lights: List[Light], shapes: List[RTShape]) extends Scene[
   }
 
   override def getShadow(point: Vec3, light: Light): Double = {
-    val pointToLight = new Vec3(point, light.location)
+    val pointToLight = new Vec3(light.location, point)
     val distToLight = pointToLight.length
     val shadowRayDirection = pointToLight.normalize
 
     @tailrec
     def shadowTest(_shapes: List[RTShape]): Double = _shapes match {
       case Nil => 1
-      case shape :: tail => shape.getRayHit(point, shadowRayDirection) match {
+      case shape :: tail => shape.getRayHit(light.location, shadowRayDirection) match {
         case None => shadowTest(tail)
         case Some(RayHit(distance, _, _, _)) =>
-          if (distance > RAY_HIT_BIAS && distance < distToLight) 0
+          if (distance < distToLight - RAY_HIT_BIAS) 0
           else shadowTest(tail)
       }
     }

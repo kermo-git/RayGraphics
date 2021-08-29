@@ -1,12 +1,13 @@
 package Graphics3D.Materials
 
+import Graphics3D.BaseObjects._
+import Graphics3D.Colors._
+import Graphics3D.Config._
+import Graphics3D.Utils._
+
 import scala.math.pow
 
-import Graphics3D.BaseObjects._
-import Graphics3D.Config._
-import Graphics3D._
-
-class Matte(val diffuse: Color, val specular: Color = WHITE, val shininess: Double = 0.5 * 128) extends Material {
+case class Matte(diffuse: Color, specular: Color = WHITE, shininess: Double = 0.5 * 128) extends Material {
 
   val ambient: Color = diffuse * 0.1
 
