@@ -88,4 +88,25 @@ object Scenes {
       )
     )
   )
+
+  val noisyShape = new RayMarchingScene(
+    imageWidth = 600,
+    imageHeight = 600,
+    FOVDegrees = 30,
+
+    lights = List(Light(0, 0, 0)),
+
+    shapes = List(
+      NoisyShape(
+        shape = Torus(mainRadius = 5, tubeRadius = 3,
+          trans = new Transformation(-50, 0, 0, 0, 0, 15),
+          material = Matte(DEEP_SKY_BLUE)
+        ),
+        noise = Noise.fractalNoise(Noise.perlinNoise)(),
+        noiseFrequency = 2,
+        noiseAmplifier = 0.5,
+        stepScale = 0.5
+      )
+    )
+  )
 }

@@ -9,13 +9,13 @@ import scala.math.abs
 import scala.util.Random
 
 object Noise {
-  type NoiseGenerator = Vec3 => Double
+  type NoiseFunction = Vec3 => Double
 
   class NoiseDisplay(
     val imageWidth: Int,
     val imageHeight: Int,
     val unitSizePx: Int,
-    val noise: NoiseGenerator
+    val noise: NoiseFunction
   ) extends Renderable {
 
     override def getPixelColor(x: Int, y: Int): Color = {
@@ -32,7 +32,7 @@ object Noise {
   def valueNoise(point: Vec3): Double = 0.5 * signedValueNoise(point) + 0.5
   def turbulenceValueNoise(point: Vec3): Double = abs(signedValueNoise(point))
 
-  def fractalNoise(noiseFunction: NoiseGenerator)(octaves: Int = 4, persistence: Double = 0.4)(point: Vec3): Double = {
+  def fractalNoise(noiseFunction: NoiseFunction)(octaves: Int = 4, persistence: Double = 0.4)(point: Vec3): Double = {
     @tailrec
     def octave(i: Int = 1, total: Double = 0, frequency: Double = 1, amplitude: Double = 1, max_value: Double = 0): Double = {
       if (i == octaves)
