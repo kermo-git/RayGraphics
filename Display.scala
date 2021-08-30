@@ -2,9 +2,7 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
-
-import Graphics3D.BaseObjects.{Scene, Shape}
-import Graphics3D.Colors._
+import Graphics3D.BaseObjects.Renderable
 
 class Display(val image: BufferedImage) extends JPanel {
   override def paint(g: Graphics): Unit = {
@@ -13,20 +11,25 @@ class Display(val image: BufferedImage) extends JPanel {
 }
 
 object Main {
-  def sceneToImage[O <: Shape](scene: Scene[O]): BufferedImage = {
+  def sceneToImage(scene: Renderable): BufferedImage = {
     val image: BufferedImage = new BufferedImage(
       scene.imageWidth,
       scene.imageHeight,
       BufferedImage.TYPE_INT_RGB
     )
-    scene.render((x: Int, y: Int, color: Color) => image.setRGB(x, y, color.toHex))
+    for (x <- 0 until scene.imageWidth) {
+      for (y <- 0 until scene.imageHeight) {
+        val color = scene.getPixelColor(x, y)
+        image.setRGB(x, y, color.toHex)
+      }
+    }
     image
   }
 
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    val image: BufferedImage = sceneToImage(Scenes.insideBox)
+    val image: BufferedImage = sceneToImage(Scenes.perlinNoise)
     val frame = new JFrame
     frame.setTitle("3D Graphics")
     frame.setSize(image.getWidth, image.getHeight)
