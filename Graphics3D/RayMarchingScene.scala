@@ -11,7 +11,7 @@ class RayMarchingScene(
   FOVDegrees: Int = 70,
 
   maxBounces: Int = 5,
-  rayHitBias: Double = 0.005,
+  rayHitBias: Double = SURFACE_BIAS,
   renderShadows: Boolean = true,
 
   val maxDist: Double = 100,

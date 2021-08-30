@@ -49,9 +49,13 @@ object BaseObjects {
     def shade[S <: Shape](scene: Scene[S], incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
   }
 
-  case class RayHit(distFromOrigin: Double, hitPoint: Vec3, hitNormal: Vec3, material: Material)
+  case class RayHit(hitPoint: Vec3, distFromOrigin: Double)
 
-  class Shape(val material: Material, val pos: Position = noMove)
+  trait Shape {
+    val material: Material
+    val pos: Position = noMove
+    def getNormal(point: Vec3): Vec3
+  }
 
   trait RTShape extends Shape {
     def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit]
@@ -62,11 +66,13 @@ object BaseObjects {
 
     override def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit] =
       getRayHitAtObjectSpace(origin * pos.fullInv, direction * pos.rotInv) match {
-        case Some(RayHit(d, p, n, m)) =>
-          Some(RayHit(d, p * pos.full, n * pos.rot, m))
+        case Some(RayHit(hitPoint, dist)) =>
+          Some(RayHit(hitPoint * pos.full, dist))
         case None => None
       }
   }
+
+  val SURFACE_BIAS = 0.005
 
   val incX: Vec3 = Vec3(0.001, 0, 0)
   val incY: Vec3 = Vec3(0, 0.001, 0)
@@ -75,7 +81,7 @@ object BaseObjects {
   trait RMShape extends Shape {
     def getDistance(point: Vec3): Double
 
-    def getNormal(point: Vec3): Vec3 = {
+    override def getNormal(point: Vec3): Vec3 = {
       val gradX = getDistance(point - incX) - getDistance(point + incX)
       val gradY = getDistance(point - incY) - getDistance(point + incY)
       val gradZ = getDistance(point - incZ) - getDistance(point + incZ)

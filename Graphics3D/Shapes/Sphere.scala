@@ -4,7 +4,7 @@ import Graphics3D.BaseObjects._
 import Graphics3D.Utils._
 
 case class Sphere(center: Vec3, radius: Double,
-                  override val material: Material) extends Shape(material) with RMShape with RTShape {
+                  override val material: Material) extends RMShape with RTShape {
 
   val equationConst: Double = (center dot center) - radius * radius
 
@@ -27,7 +27,7 @@ case class Sphere(center: Vec3, radius: Double,
           val distance = if (low > 0) low else high
           val hitPoint = origin + direction * distance
 
-          Some(RayHit(distance, hitPoint, getNormal(hitPoint), material))
+          Some(RayHit(hitPoint, distance))
         }
     }
   }

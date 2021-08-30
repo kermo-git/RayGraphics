@@ -4,7 +4,7 @@ import Graphics3D.BaseObjects._
 import Graphics3D.Utils._
 
 case class Plane(point: Vec3 = origin, normal: Vec3 = unitY,
-                 override val material: Material) extends Shape(material) with RTShape with RMShape {
+                 override val material: Material) extends RTShape with RMShape {
 
   private val planeBias = point dot normal
 
@@ -13,12 +13,12 @@ case class Plane(point: Vec3 = origin, normal: Vec3 = unitY,
     if (normalDotDir == 0)
       None
     else {
-      val dist = (planeBias - (normal dot origin)) / normalDotDir
-      if (dist < 0)
+      val distance = (planeBias - (normal dot origin)) / normalDotDir
+      if (distance < 0)
         None
       else {
-        val hitPoint = origin + direction * dist
-        Some(RayHit(dist, hitPoint, normal, material))
+        val hitPoint = origin + direction * distance
+        Some(RayHit(hitPoint, distance))
       }
     }
   }

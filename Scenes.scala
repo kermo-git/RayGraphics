@@ -14,7 +14,7 @@ object Scenes {
     noise = Noise.perlinNoise
   )
 
-  val insideBox = new RayMarchingScene(
+  val testScene = new RayTracingScene(
     imageWidth = 600,
     imageHeight = 600,
 
@@ -41,11 +41,11 @@ object Scenes {
     )
   )
 
-  val torus = new RayMarchingScene(
+  val torusAndShadow = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
 
-    lights = List(Light(10, 8, 10)),
+    lights = List(Light(15, 20, 25, shadowSharpness = 8)),
     softShadows = true,
 
     shapes = List(
@@ -54,9 +54,37 @@ object Scenes {
         normal = unitY,
         material = Matte(MEDIUM_VIOLET_RED)
       ),
-      Torus(mainRadius = 10, tubeRadius = 3,
-        pos = new Position(-30, 0, 0, 0, 3, 25),
+      Torus(mainRadius = 6, tubeRadius = 2,
+        pos = new Position(-50, 0, 0, 7, 0, 25),
         material = Matte(ORANGE_RED)
+      )
+    )
+  )
+
+  val cubeHighLights = new RayMarchingScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    lights = List(Light(-10, 15, 30), Light(20, 0, 30), Light(-15, -20, 25)),
+
+    shapes = List(
+      new Box(sideLength = 10,
+        pos = new Position(-40, 30, 0, 0, 0, 20),
+        material = Matte(ORANGE_RED)
+      )
+    )
+  )
+
+  val insideCylinder = new RayMarchingScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    lights = List(Light(-4, 0, 15)),
+
+    shapes = List(
+      Cylinder(height = 20, radius = 5,
+        pos = new Position(89, 0, 0, 0, 0, 10),
+        material = Matte(IVORY)
       )
     )
   )

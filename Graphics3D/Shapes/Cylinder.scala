@@ -7,12 +7,24 @@ import scala.math.{abs, sqrt}
 
 case class Cylinder(height: Double, radius: Double,
                     override val pos: Position,
-                    override val material: Material) extends Shape(material, pos) with OriginRTShape with OriginRMShape {
+                    override val material: Material) extends OriginRTShape with OriginRMShape {
 
   private val rSqr = radius * radius
   private val rRec = 1 / radius
   private val minY = -0.5 * height
   private val maxY = 0.5 * height
+
+  override def getNormal(point: Vec3): Vec3 = {
+    val _point = point * pos.fullInv
+
+    val normal =
+      if (_point.y - SURFACE_BIAS < minY || _point.y + SURFACE_BIAS > maxY)
+        unitY
+      else
+        Vec3(_point.x, 0, _point.z).normalize
+
+    normal * pos.rot
+  }
 
   override def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit] = {
     val a = direction.x * direction.x + direction.z * direction.z
@@ -29,16 +41,11 @@ case class Cylinder(height: Double, radius: Double,
         else {
           def capHit(capY: Double): Option[RayHit] = {
             val distance = (capY - origin.y) / direction.y
-            val normal = unitY
             val hitPoint = origin + direction * distance
-            Some(RayHit(distance, hitPoint, normal, material))
+            Some(RayHit(hitPoint, distance))
           }
 
-          def sideHit(distance: Double): Option[RayHit] = {
-            val hitPoint = origin + direction * distance
-            val normal = Vec3(hitPoint.x * rRec, 0, hitPoint.z * rRec)
-            Some(RayHit(distance, hitPoint, normal, material))
-          }
+          def sideHit(distance: Double): Option[RayHit] = Some(RayHit(origin + direction * distance, distance))
 
           val nearSideHitY = origin.y + low * direction.y
           val farSideHitY = origin.y + high * direction.y

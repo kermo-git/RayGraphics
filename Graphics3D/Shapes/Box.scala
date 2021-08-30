@@ -7,10 +7,21 @@ import scala.math.{abs, max, sqrt}
 
 case class Box(lenX: Double, lenY: Double, lenZ: Double,
                override val pos: Position,
-               override val material: Material) extends Shape(material, pos) with OriginRTShape with OriginRMShape {
+               override val material: Material) extends OriginRTShape with OriginRMShape {
 
   def this(sideLength: Double, pos: Position, material: Material) {
     this(sideLength, sideLength, sideLength, pos, material)
+  }
+
+  override def getNormal(point: Vec3): Vec3 = {
+    val _point = point * pos.fullInv
+
+    val absX = abs(_point.x) + SURFACE_BIAS
+    val absZ = abs(_point.z) + SURFACE_BIAS
+
+    val normal = if (absX < maxX) { if (absZ < maxZ) unitY else unitZ } else unitX
+
+    normal * pos.rot
   }
 
   private val maxX = 0.5 * lenX
@@ -22,20 +33,18 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
   private val minZ = -maxZ
 
   abstract class HitTest {
-    val hitNormal: Vec3
     def getHitDist(origin: Vec3, direction: Vec3): Double
     def inBounds(hitPoint: Vec3): Boolean
     def getHit(origin: Vec3, direction: Vec3, distance: Double): Option[RayHit] = {
       val hit = origin + direction * distance
       if (inBounds(hit))
-        Some(RayHit(distance, hit, hitNormal, material))
+        Some(RayHit(hit, distance))
       else
         None
     }
   }
 
   case class HitTestX(xPlanePos: Double) extends HitTest{
-    val hitNormal: Vec3 = unitX
     def getHitDist(origin: Vec3, direction: Vec3): Double = (xPlanePos - origin.x) / direction.x
     def inBounds(hitPoint: Vec3): Boolean =
       hitPoint.y >= minY && hitPoint.y <= maxY &&
@@ -43,7 +52,6 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
   }
 
   case class HitTestY(yPlanePos: Double) extends HitTest {
-    val hitNormal: Vec3 = unitY
     def getHitDist(origin: Vec3, direction: Vec3): Double = (yPlanePos - origin.y) / direction.y
     def inBounds(hitPoint: Vec3): Boolean =
       hitPoint.x >= minX && hitPoint.x <= maxX &&
@@ -51,7 +59,6 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
   }
 
   case class HitTestZ(zPlanePos: Double) extends HitTest {
-    val hitNormal: Vec3 = unitZ
     def getHitDist(origin: Vec3, direction: Vec3): Double = (zPlanePos - origin.z) / direction.z
     def inBounds(hitPoint: Vec3): Boolean =
       hitPoint.x >= minX && hitPoint.x <= maxX &&
@@ -73,7 +80,7 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
         prevHit
       else prevHit match {
         case None => nextTest.getHit(origin, direction, distance)
-        case Some(RayHit(prevDist, _, _, _)) =>
+        case Some(RayHit(_, prevDist)) =>
           if (distance < prevDist)
             nextTest.getHit(origin, direction, distance) match {
               case None => prevHit

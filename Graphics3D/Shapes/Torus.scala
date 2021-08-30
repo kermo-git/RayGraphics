@@ -7,7 +7,7 @@ import scala.math.sqrt
 
 case class Torus(mainRadius: Double, tubeRadius: Double,
                  override val pos: Position,
-                 override val material: Material) extends Shape(material, pos) with OriginRMShape {
+                 override val material: Material) extends OriginRMShape {
 
   override def getNormal(point: Vec3): Vec3 = {
     val transformed = point * pos.fullInv

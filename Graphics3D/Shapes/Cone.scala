@@ -7,7 +7,17 @@ import scala.math.{min, sqrt}
 
 case class Cone(height: Double, radius: Double,
                 override val pos: Position,
-                override val material: Material) extends Shape(material, pos) with OriginRTShape with OriginRMShape {
+                override val material: Material) extends OriginRTShape with OriginRMShape {
+
+  override def getNormal(point: Vec3): Vec3 = {
+    val _point = point * pos.fullInv
+
+    val normal = if (_point.y - SURFACE_BIAS < 0) unitY else {
+      val radiusVec = Vec3(_point.x, 0, _point.z).normalize
+      Vec3(radiusVec.x, normalTan, radiusVec.z).normalize
+    }
+    normal * pos.rot
+  }
 
   private val hSqr_div_rSqr = (height * height) / (radius * radius)
   private val _2h = 2 * height
@@ -22,9 +32,7 @@ case class Cone(height: Double, radius: Double,
       if (hitPoint.y < 0 || hitPoint.y > height)
         None
       else {
-        val _vec = Vec3(hitPoint.x, 0, hitPoint.z).normalize
-        val normal = Vec3(_vec.x, normalTan, _vec.z).normalize
-        Some(RayHit(distance, hitPoint, normal, material))
+        Some(RayHit(hitPoint, distance))
       }
     }
   }
@@ -58,11 +66,11 @@ case class Cone(height: Double, radius: Double,
       if (bottomHitRadius > radius)
         coneHit
       else {
-        val bottomHit = Some(RayHit(bottomDist, bottomHitPoint, unitY, material))
+        val bottomHit = Some(RayHit(bottomHitPoint, bottomDist))
 
         coneHit match {
           case None => bottomHit
-          case Some(RayHit(coneDist, _, _, _)) =>
+          case Some(RayHit(_, coneDist)) =>
             if (coneDist > bottomDist)
               bottomHit
             else
