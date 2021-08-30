@@ -68,18 +68,17 @@ object BaseObjects {
       }
   }
 
+  val incX: Vec3 = Vec3(0.001, 0, 0)
+  val incY: Vec3 = Vec3(0, 0.001, 0)
+  val incZ: Vec3 = Vec3(0, 0, 0.001)
+
   trait RMShape extends Shape {
     def getDistance(point: Vec3): Double
 
-    private val GRADIENT_EPSILON = 0.001
-    private val eX = Vec3(GRADIENT_EPSILON, 0, 0)
-    private val eY = Vec3(0, GRADIENT_EPSILON, 0)
-    private val eZ = Vec3(0, 0, GRADIENT_EPSILON)
-
     def getNormal(point: Vec3): Vec3 = {
-      val gradX = getDistance(point - eX) - getDistance(point + eX)
-      val gradY = getDistance(point - eY) - getDistance(point + eY)
-      val gradZ = getDistance(point - eZ) - getDistance(point + eZ)
+      val gradX = getDistance(point - incX) - getDistance(point + incX)
+      val gradY = getDistance(point - incY) - getDistance(point + incY)
+      val gradZ = getDistance(point - incZ) - getDistance(point + incZ)
 
       Vec3(gradX, gradY, gradZ).normalize
     }

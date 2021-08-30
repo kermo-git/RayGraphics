@@ -14,7 +14,7 @@ object Scenes {
     noise = Noise.perlinNoise
   )
 
-  val insideBox: Renderable = new RayMarchingScene(
+  val insideBox = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
 
@@ -41,11 +41,11 @@ object Scenes {
     )
   )
 
-  val plane: Renderable = new RayMarchingScene(
+  val torus = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
 
-    lights = List(Light(10, 8, 10, shadowSharpness = 10)),
+    lights = List(Light(10, 8, 10)),
     softShadows = true,
 
     shapes = List(
@@ -54,8 +54,8 @@ object Scenes {
         normal = unitY,
         material = Matte(MEDIUM_VIOLET_RED)
       ),
-      Cylinder(height = 10, radius = 3,
-        pos = new Position(0, -8, 20),
+      Torus(mainRadius = 10, tubeRadius = 3,
+        pos = new Position(-30, 0, 0, 0, 3, 25),
         material = Matte(ORANGE_RED)
       )
     )
