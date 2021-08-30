@@ -53,7 +53,7 @@ object BaseObjects {
 
   trait Shape {
     val material: Material
-    val pos: Position = noMove
+    val trans: Transformation = nullTransformation
     def getNormal(point: Vec3): Vec3
   }
 
@@ -65,9 +65,9 @@ object BaseObjects {
     def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit]
 
     override def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit] =
-      getRayHitAtObjectSpace(origin * pos.fullInv, direction * pos.rotInv) match {
+      getRayHitAtObjectSpace(origin * trans.fullInverse, direction * trans.rotationInverse) match {
         case Some(RayHit(hitPoint, dist)) =>
-          Some(RayHit(hitPoint * pos.full, dist))
+          Some(RayHit(hitPoint * trans.fullTransformation, dist))
         case None => None
       }
   }
@@ -88,10 +88,5 @@ object BaseObjects {
 
       Vec3(gradX, gradY, gradZ).normalize
     }
-  }
-
-  trait OriginRMShape extends RMShape {
-    def getDistanceAtObjectSpace(point: Vec3): Double
-    override def getDistance(point: Vec3): Double = getDistanceAtObjectSpace(point * pos.fullInv)
   }
 }

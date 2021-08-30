@@ -14,7 +14,7 @@ object Scenes {
     noise = Noise.perlinNoise
   )
 
-  val testScene = new RayTracingScene(
+  val testScene = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
 
@@ -22,7 +22,7 @@ object Scenes {
 
     shapes = List(
       Cone(height = 15, radius = 7,
-        pos = new Position(7, -15, 29),
+        trans = new Transformation(7, -15, 29),
         material = Matte(FIREBRICK)
       ),
       Sphere(
@@ -31,11 +31,11 @@ object Scenes {
         material = Matte(ORANGE)
       ),
       Cylinder(height = 20, radius = 6,
-        pos = new Position(-88.2, -36, 0, 4, 7, 39),
+        trans = new Transformation(-88.2, -36, 0, 4, 7, 39),
         material = Matte(ORANGE_RED)
       ),
       Box(lenX = 30, lenY = 30, lenZ = 50,
-        pos = new Position(0, 0, 24),
+        trans = new Transformation(0, 0, 24),
         material = Matte(AZURE)
       )
     )
@@ -55,7 +55,7 @@ object Scenes {
         material = Matte(MEDIUM_VIOLET_RED)
       ),
       Torus(mainRadius = 6, tubeRadius = 2,
-        pos = new Position(-50, 0, 0, 7, 0, 25),
+        trans = new Transformation(-50, 0, 0, 7, 0, 25),
         material = Matte(ORANGE_RED)
       )
     )
@@ -68,8 +68,8 @@ object Scenes {
     lights = List(Light(-10, 15, 30), Light(20, 0, 30), Light(-15, -20, 25)),
 
     shapes = List(
-      new Box(sideLength = 10,
-        pos = new Position(-40, 30, 0, 0, 0, 20),
+      Box(lenX = 10, lenY = 10, lenZ = 10,
+        trans = new Transformation(-40, 30, 0, 0, 0, 20),
         material = Matte(ORANGE_RED)
       )
     )
@@ -83,7 +83,7 @@ object Scenes {
 
     shapes = List(
       Cylinder(height = 20, radius = 5,
-        pos = new Position(89, 0, 0, 0, 0, 10),
+        trans = new Transformation(89, 0, 0, 0, 0, 10),
         material = Matte(IVORY)
       )
     )

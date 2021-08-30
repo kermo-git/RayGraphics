@@ -6,17 +6,17 @@ import Graphics3D.Utils._
 import scala.math.{min, sqrt}
 
 case class Cone(height: Double, radius: Double,
-                override val pos: Position,
-                override val material: Material) extends OriginRTShape with OriginRMShape {
+                override val trans: Transformation,
+                override val material: Material) extends OriginRTShape with RMShape {
 
   override def getNormal(point: Vec3): Vec3 = {
-    val _point = point * pos.fullInv
+    val _point = point * trans.fullInverse
 
     val normal = if (_point.y - SURFACE_BIAS < 0) unitY else {
       val radiusVec = Vec3(_point.x, 0, _point.z).normalize
       Vec3(radiusVec.x, normalTan, radiusVec.z).normalize
     }
-    normal * pos.rot
+    normal * trans.rotation
   }
 
   private val hSqr_div_rSqr = (height * height) / (radius * radius)
@@ -84,9 +84,11 @@ case class Cone(height: Double, radius: Double,
   private val krec = -radius / height
   private val k_krec = k + krec
 
-  override def getDistanceAtObjectSpace(point: Vec3): Double = {
-    val xp = Vec3(point.x, 0, point.z).length
-    val yp = point.y
+  override def getDistance(point: Vec3): Double = {
+    val _point = point * trans.fullInverse
+
+    val xp = Vec3(_point.x, 0, _point.z).length
+    val yp = _point.y
     val p = Vec3(xp, yp, 0)
 
     val xc = (yp + krec * xp - height) / k_krec

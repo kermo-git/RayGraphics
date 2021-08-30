@@ -6,22 +6,18 @@ import Graphics3D.Utils._
 import scala.math.{abs, max, sqrt}
 
 case class Box(lenX: Double, lenY: Double, lenZ: Double,
-               override val pos: Position,
-               override val material: Material) extends OriginRTShape with OriginRMShape {
-
-  def this(sideLength: Double, pos: Position, material: Material) {
-    this(sideLength, sideLength, sideLength, pos, material)
-  }
+               override val trans: Transformation,
+               override val material: Material) extends OriginRTShape with RMShape {
 
   override def getNormal(point: Vec3): Vec3 = {
-    val _point = point * pos.fullInv
+    val _point = point * trans.fullInverse
 
     val absX = abs(_point.x) + SURFACE_BIAS
     val absZ = abs(_point.z) + SURFACE_BIAS
 
     val normal = if (absX < maxX) { if (absZ < maxZ) unitY else unitZ } else unitX
 
-    normal * pos.rot
+    normal * trans.rotation
   }
 
   private val maxX = 0.5 * lenX
@@ -93,7 +89,9 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
     tests.foldLeft[Option[RayHit]](None)(testNextSide)
   }
 
-  override def getDistanceAtObjectSpace(point: Vec3): Double = {
+  override def getDistance(p: Vec3): Double = {
+    val point = p * trans.fullInverse
+
     val distX = abs(point.x) - maxX
     val distY = abs(point.y) - maxY
     val distZ = abs(point.z) - maxZ
