@@ -10,10 +10,10 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
                override val material: Material) extends OriginRTShape with RMShape {
 
   override def getNormal(point: Vec3): Vec3 = {
-    val _point = point * trans.fullInverse
+    val t = point * trans.fullInverse
 
-    val absX = abs(_point.x) + SURFACE_BIAS
-    val absZ = abs(_point.z) + SURFACE_BIAS
+    val absX = abs(t.x) + SURFACE_BIAS
+    val absZ = abs(t.z) + SURFACE_BIAS
 
     val normal = if (absX < maxX) { if (absZ < maxZ) unitY else unitZ } else unitX
 
@@ -89,12 +89,12 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
     tests.foldLeft[Option[RayHit]](None)(testNextSide)
   }
 
-  override def getDistance(p: Vec3): Double = {
-    val point = p * trans.fullInverse
+  override def getDistance(point: Vec3): Double = {
+    val t = point * trans.fullInverse
 
-    val distX = abs(point.x) - maxX
-    val distY = abs(point.y) - maxY
-    val distZ = abs(point.z) - maxZ
+    val distX = abs(t.x) - maxX
+    val distY = abs(t.y) - maxY
+    val distZ = abs(t.z) - maxZ
 
     if (distX < 0 && distY < 0 && distZ < 0)
       max(distX, max(distZ, distY))

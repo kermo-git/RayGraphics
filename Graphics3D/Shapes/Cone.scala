@@ -10,10 +10,10 @@ case class Cone(height: Double, radius: Double,
                 override val material: Material) extends OriginRTShape with RMShape {
 
   override def getNormal(point: Vec3): Vec3 = {
-    val _point = point * trans.fullInverse
+    val t = point * trans.fullInverse
 
-    val normal = if (_point.y - SURFACE_BIAS < 0) unitY else {
-      val radiusVec = Vec3(_point.x, 0, _point.z).normalize
+    val normal = if (t.y - SURFACE_BIAS < 0) unitY else {
+      val radiusVec = Vec3(t.x, 0, t.z).normalize
       Vec3(radiusVec.x, normalTan, radiusVec.z).normalize
     }
     normal * trans.rotation
@@ -85,10 +85,10 @@ case class Cone(height: Double, radius: Double,
   private val k_krec = k + krec
 
   override def getDistance(point: Vec3): Double = {
-    val _point = point * trans.fullInverse
+    val t = point * trans.fullInverse
 
-    val xp = Vec3(_point.x, 0, _point.z).length
-    val yp = _point.y
+    val xp = Vec3(t.x, 0, t.z).length
+    val yp = t.y
     val p = Vec3(xp, yp, 0)
 
     val xc = (yp + krec * xp - height) / k_krec

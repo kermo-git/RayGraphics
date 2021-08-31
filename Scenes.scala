@@ -14,7 +14,7 @@ object Scenes {
     noise = Noise.perlinNoise
   )
 
-  val testScene = new RayMarchingScene(
+  val testScene = new RayTracingScene(
     imageWidth = 600,
     imageHeight = 600,
 
@@ -103,9 +103,40 @@ object Scenes {
           material = Matte(DEEP_SKY_BLUE)
         ),
         noise = Noise.fractalNoise(Noise.perlinNoise)(),
-        noiseFrequency = 2,
-        noiseAmplifier = 0.5,
-        stepScale = 0.5
+        noiseFrequency = 2
+      )
+    )
+  )
+
+  val blendedShapes = new RayMarchingScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    lights = List(Light(20, 0, 20, shadowSharpness = 10)),
+    softShadows = true,
+
+    shapes = List(
+      Plane(point = Vec3(0, -8, 0), normal = unitY, material = Matte(TURQUOISE)),
+      Cut(
+        shape = Blend(
+          smoothness = 3,
+          shape1 = Torus(
+            mainRadius = 10,
+            tubeRadius = 5,
+            trans = new Transformation(-40, 0, 0, 10, 5, 40),
+            material = Matte(GOLD)
+          ),
+          shape2 = Sphere(
+            center = Vec3(-7, 5, 40),
+            radius = 7,
+            material = Matte(GOLD)
+          )
+        ),
+        cut = Box(
+          lenX = 14, lenY = 7, lenZ = 7,
+          trans = new Transformation(-30, 0, 0, 10, 0, 27),
+          material = Matte(GOLD)
+        )
       )
     )
   )

@@ -53,7 +53,6 @@ object BaseObjects {
 
   trait Shape {
     val material: Material
-    val trans: Transformation = nullTransformation
     def getNormal(point: Vec3): Vec3
   }
 
@@ -62,6 +61,8 @@ object BaseObjects {
   }
 
   trait OriginRTShape extends RTShape {
+    val trans: Transformation
+
     def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit]
 
     override def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit] =

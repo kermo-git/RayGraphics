@@ -14,13 +14,13 @@ case class Cylinder(height: Double, radius: Double,
   private val maxY = 0.5 * height
 
   override def getNormal(point: Vec3): Vec3 = {
-    val _point = point * trans.fullInverse
+    val t = point * trans.fullInverse
 
     val normal =
-      if (_point.y - SURFACE_BIAS < minY || _point.y + SURFACE_BIAS > maxY)
+      if (t.y - SURFACE_BIAS < minY || t.y + SURFACE_BIAS > maxY)
         unitY
       else
-        Vec3(_point.x, 0, _point.z).normalize
+        Vec3(t.x, 0, t.z).normalize
 
     normal * trans.rotation
   }
@@ -72,11 +72,11 @@ case class Cylinder(height: Double, radius: Double,
     }
   }
 
-  override def getDistance(p: Vec3): Double = {
-    val point = p * trans.fullInverse
+  override def getDistance(point: Vec3): Double = {
+    val t = point * trans.fullInverse
 
-    val capDistance = abs(point.y) - maxY
-    val cylinderDistance = Vec3(point.x, 0, point.z).length - radius
+    val capDistance = abs(t.y) - maxY
+    val cylinderDistance = Vec3(t.x, 0, t.z).length - radius
 
     val inInfiniteCylinder = cylinderDistance < 0
     val betweenCaps = capDistance < 0
