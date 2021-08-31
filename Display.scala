@@ -2,6 +2,7 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
+
 import Graphics3D.BaseObjects.Renderable
 
 class Display(val image: BufferedImage) extends JPanel {

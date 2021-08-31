@@ -1,8 +1,8 @@
 package Graphics3D
 
-import BaseObjects._, Colors._, Utils._
-
 import scala.annotation.tailrec
+
+import BaseObjects._, Colors._, Utils._
 
 class RayTracingScene(
   imageWidth: Int,
@@ -21,17 +21,23 @@ class RayTracingScene(
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
     def testNextShape(prevHit: ShapeHit, nextShape: RTShape): ShapeHit = {
+
       val newHit = nextShape.getRayHit(origin, direction)
+
       newHit match {
         case None => prevHit
-        case Some(RayHit(nextHitPoint, nextDist)) => prevHit match {
-          case None => Some(nextShape, nextHitPoint, nextDist)
-          case Some((_, _, prevDist)) =>
-            if (prevDist < nextDist)
-              prevHit
-            else
-              Some(nextShape, nextHitPoint, nextDist)
-        }
+        case Some(RayHit(nextHitPoint, nextDist)) =>
+
+          val nextHit = Some((nextShape, nextHitPoint, nextDist))
+
+          prevHit match {
+            case None => nextHit
+            case Some((_, _, prevDist)) =>
+              if (prevDist < nextDist)
+                prevHit
+              else
+                nextHit
+          }
       }
     }
     shapes.foldLeft[ShapeHit](None)(testNextShape) match {

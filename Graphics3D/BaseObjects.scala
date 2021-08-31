@@ -1,9 +1,8 @@
 package Graphics3D
 
-import Colors._
-import Utils._
-
 import scala.math.{tan, toRadians}
+
+import Colors._, Utils._
 
 object BaseObjects {
   case class Light(x: Double, y: Double, z: Double, color: Color = WHITE, shadowSharpness: Int = 20) {
@@ -61,23 +60,28 @@ object BaseObjects {
   }
 
   trait OriginRTShape extends RTShape {
-    val trans: Transformation
+    val transformation: Transformation
 
     def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit]
 
     override def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit] =
-      getRayHitAtObjectSpace(origin * trans.fullInverse, direction * trans.rotationInverse) match {
+      getRayHitAtObjectSpace(
+        origin * transformation.fullInverse,
+        direction * transformation.rotationInverse
+      ) match {
         case Some(RayHit(hitPoint, dist)) =>
-          Some(RayHit(hitPoint * trans.fullTransformation, dist))
+          Some(RayHit(hitPoint * transformation.full, dist))
         case None => None
       }
   }
 
   val SURFACE_BIAS = 0.005
 
-  val incX: Vec3 = Vec3(0.001, 0, 0)
-  val incY: Vec3 = Vec3(0, 0.001, 0)
-  val incZ: Vec3 = Vec3(0, 0, 0.001)
+  val (incX, incY, incZ) = (
+    Vec3(0.001, 0, 0),
+    Vec3(0, 0.001, 0),
+    Vec3(0, 0, 0.001)
+  )
 
   trait RMShape extends Shape {
     def getDistance(point: Vec3): Double

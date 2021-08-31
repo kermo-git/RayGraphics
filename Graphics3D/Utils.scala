@@ -67,11 +67,9 @@ object Utils {
 
     val rotation: Matrix = rotateAroundX(radX) * rotateAroundY(radY) * rotateAroundZ(radZ)
     val rotationInverse: Matrix = rotateAroundZ(-radZ) * rotateAroundY(-radY) * rotateAroundX(-radX)
-    val fullTransformation: Matrix = rotation * translate(x, y, z)
+    val full: Matrix = rotation * translate(x, y, z)
     val fullInverse: Matrix = translate(-x, -y, -z) * rotationInverse
   }
-
-  val nullTransformation: Transformation = new Transformation(0, 0, 0)
 
   case class Vec3(x: Double, y: Double, z: Double) {
     def this(v1: Vec3, v2: Vec3) {

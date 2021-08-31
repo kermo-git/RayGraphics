@@ -1,20 +1,19 @@
 package Graphics3D.Shapes
 
-import Graphics3D.BaseObjects._
-import Graphics3D.Utils._
-
 import scala.math.{abs, sqrt}
 
-case class Cylinder(height: Double, radius: Double,
-                    override val trans: Transformation,
-                    override val material: Material) extends OriginRTShape with RMShape {
+import Graphics3D.BaseObjects._
+import Graphics3D.Utils._
+import Graphics3D.Materials.Matte
 
-  private val rSqr = radius * radius
-  private val minY = -0.5 * height
-  private val maxY = 0.5 * height
+case class Cylinder(height: Double, radius: Double,
+                    override val transformation: Transformation,
+                    override val material: Material = Matte()) extends OriginRTShape with RMShape {
+
+  private val (rSqr, minY, maxY) = (radius * radius, -0.5 * height, 0.5 * height)
 
   override def getNormal(point: Vec3): Vec3 = {
-    val t = point * trans.fullInverse
+    val t = point * transformation.fullInverse
 
     val normal =
       if (t.y - SURFACE_BIAS < minY || t.y + SURFACE_BIAS > maxY)
@@ -22,7 +21,7 @@ case class Cylinder(height: Double, radius: Double,
       else
         Vec3(t.x, 0, t.z).normalize
 
-    normal * trans.rotation
+    normal * transformation.rotation
   }
 
   override def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit] = {
@@ -73,7 +72,7 @@ case class Cylinder(height: Double, radius: Double,
   }
 
   override def getDistance(point: Vec3): Double = {
-    val t = point * trans.fullInverse
+    val t = point * transformation.fullInverse
 
     val capDistance = abs(t.y) - maxY
     val cylinderDistance = Vec3(t.x, 0, t.z).length - radius

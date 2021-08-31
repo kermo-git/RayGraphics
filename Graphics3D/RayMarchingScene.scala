@@ -1,9 +1,9 @@
 package Graphics3D
 
-import BaseObjects._, Colors._, Utils._
-
 import scala.annotation.tailrec
 import scala.math.{abs, min}
+
+import BaseObjects._, Colors._, Utils._
 
 class RayMarchingScene(
   imageWidth: Int,
@@ -22,13 +22,13 @@ class RayMarchingScene(
   shapes: List[RMShape]
 ) extends Scene[RMShape](imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights, shapes) {
 
-  type DistInfo = Option[(RMShape, Double)]
-  type HitPointInfo = Option[(RMShape, Vec3)]
+  type ShapeDist = Option[(RMShape, Double)]
+  type ShapeHit = Option[(RMShape, Vec3)]
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
 
     @tailrec
-    def findHitPoint(traveledDist: Double = 0): HitPointInfo = {
+    def findHitPoint(traveledDist: Double = 0): ShapeHit = {
       if (traveledDist > maxDist) None
       else {
         val currentPos = origin + direction * traveledDist
@@ -81,7 +81,7 @@ class RayMarchingScene(
   }
 
   @tailrec
-  private def findClosestObject(viewPoint: Vec3, _shapes: List[RMShape], prevClosest: DistInfo = None): DistInfo = _shapes match {
+  private def findClosestObject(viewPoint: Vec3, _shapes: List[RMShape], prevClosest: ShapeDist = None): ShapeDist = _shapes match {
     case shape :: tail =>
       val nextDist = abs(shape.getDistance(viewPoint))
       val nextResult = Some((shape, nextDist))

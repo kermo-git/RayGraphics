@@ -1,10 +1,5 @@
 import Graphics3D._
-import Graphics3D.Utils._
-import Graphics3D.BaseObjects._
-import Graphics3D.Colors._
-import Graphics3D.Materials._
-import Graphics3D.Noise._
-import Graphics3D.Shapes._
+import Utils._, BaseObjects._, Colors._, Materials._, Noise._, Shapes._
 
 object Scenes {
   val perlinNoise = new NoiseDisplay(
@@ -22,7 +17,7 @@ object Scenes {
 
     shapes = List(
       Cone(height = 15, radius = 7,
-        trans = new Transformation(7, -15, 29),
+        transformation = new Transformation(7, -15, 29),
         material = Matte(FIREBRICK)
       ),
       Sphere(
@@ -31,11 +26,11 @@ object Scenes {
         material = Matte(ORANGE)
       ),
       Cylinder(height = 20, radius = 6,
-        trans = new Transformation(-88.2, -36, 0, 4, 7, 39),
+        transformation = new Transformation(-88.2, -36, 0, 4, 7, 39),
         material = Matte(ORANGE_RED)
       ),
       Box(lenX = 30, lenY = 30, lenZ = 50,
-        trans = new Transformation(0, 0, 24),
+        transformation = new Transformation(0, 0, 24),
         material = Matte(AZURE)
       )
     )
@@ -55,7 +50,7 @@ object Scenes {
         material = Matte(MEDIUM_VIOLET_RED)
       ),
       Torus(mainRadius = 6, tubeRadius = 2,
-        trans = new Transformation(-50, 0, 0, 7, 0, 25),
+        transformation = new Transformation(-50, 0, 0, 7, 0, 25),
         material = Matte(ORANGE_RED)
       )
     )
@@ -65,11 +60,15 @@ object Scenes {
     imageWidth = 600,
     imageHeight = 600,
 
-    lights = List(Light(-10, 15, 30), Light(20, 0, 30), Light(-15, -20, 25)),
+    lights = List(
+      Light(-10, 15, 30),
+      Light(20, 0, 30),
+      Light(-15, -20, 25)
+    ),
 
     shapes = List(
       Box(lenX = 10, lenY = 10, lenZ = 10,
-        trans = new Transformation(-40, 30, 0, 0, 0, 20),
+        transformation = new Transformation(-40, 30, 0, 0, 0, 20),
         material = Matte(ORANGE_RED)
       )
     )
@@ -83,7 +82,7 @@ object Scenes {
 
     shapes = List(
       Cylinder(height = 20, radius = 5,
-        trans = new Transformation(89, 0, 0, 0, 0, 10),
+        transformation = new Transformation(89, 0, 0, 0, 0, 10),
         material = Matte(IVORY)
       )
     )
@@ -99,7 +98,7 @@ object Scenes {
     shapes = List(
       NoisyShape(
         shape = Torus(mainRadius = 5, tubeRadius = 3,
-          trans = new Transformation(-50, 0, 0, 0, 0, 15),
+          transformation = new Transformation(-50, 0, 0, 0, 0, 15),
           material = Matte(DEEP_SKY_BLUE)
         ),
         noise = Noise.fractalNoise(Noise.perlinNoise)(),
@@ -111,31 +110,29 @@ object Scenes {
   val blendedShapes = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
+    softShadows = true,
 
     lights = List(Light(20, 0, 20, shadowSharpness = 10)),
-    softShadows = true,
 
     shapes = List(
       Plane(point = Vec3(0, -8, 0), normal = unitY, material = Matte(TURQUOISE)),
       Cut(
+        material = Matte(GOLD),
         shape = Blend(
           smoothness = 3,
           shape1 = Torus(
             mainRadius = 10,
             tubeRadius = 5,
-            trans = new Transformation(-40, 0, 0, 10, 5, 40),
-            material = Matte(GOLD)
+            transformation = new Transformation(-40, 0, 0, 10, 5, 40)
           ),
           shape2 = Sphere(
             center = Vec3(-7, 5, 40),
-            radius = 7,
-            material = Matte(GOLD)
+            radius = 7
           )
         ),
         cut = Box(
           lenX = 14, lenY = 7, lenZ = 7,
-          trans = new Transformation(-30, 0, 0, 10, 0, 27),
-          material = Matte(GOLD)
+          transformation = new Transformation(-30, 0, 0, 10, 0, 27)
         )
       )
     )

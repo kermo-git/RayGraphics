@@ -1,12 +1,12 @@
 package Graphics3D.Materials
 
+import scala.math.pow
+
 import Graphics3D.BaseObjects._
 import Graphics3D.Colors._
 import Graphics3D.Utils._
 
-import scala.math.pow
-
-case class Metal(diffuse: Color,
+case class Metal(diffuse: Color = SILVER,
                  specular: Color = WHITE,
                  shininess: Double = 0.5 * 128,
                  ior: Double = 1.3,

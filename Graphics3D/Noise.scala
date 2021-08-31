@@ -1,12 +1,10 @@
 package Graphics3D
 
-import Graphics3D.BaseObjects.Renderable
-import Graphics3D.Colors.Color
-import Utils._
-
 import scala.annotation.tailrec
 import scala.math.abs
 import scala.util.Random
+
+import BaseObjects.Renderable, Colors.Color, Utils._
 
 object Noise {
   type NoiseFunction = Vec3 => Double

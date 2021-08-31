@@ -11,9 +11,7 @@ object Colors {
     }
 
     def +(v: Color): Color = new Color(red + v.red, green + v.green, blue + v.blue)
-
     def *(v: Color): Color = new Color(red * v.red, green * v.green, blue * v.blue)
-
     def *(s: Double): Color = new Color(s * red, s * green, s * blue)
 
     def toHex: Int = {
