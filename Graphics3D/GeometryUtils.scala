@@ -2,7 +2,7 @@ package Graphics3D
 
 import scala.math.{cos, sin, sqrt, toRadians}
 
-object Utils {
+object GeometryUtils {
   type Matrix = Array[Array[Double]]
 
   val identMat: Matrix = Array(

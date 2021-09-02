@@ -2,9 +2,9 @@ package Graphics3D.Materials
 
 import scala.math.pow
 
-import Graphics3D.BaseObjects._
+import Graphics3D.Components._
 import Graphics3D.Colors._
-import Graphics3D.Utils._
+import Graphics3D.GeometryUtils._
 
 case class Matte(diffuse: Color = LIGHT_GRAY, specular: Color = WHITE, shininess: Double = 0.5 * 128) extends Material {
 

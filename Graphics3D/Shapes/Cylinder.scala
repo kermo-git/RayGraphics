@@ -2,8 +2,8 @@ package Graphics3D.Shapes
 
 import scala.math.{abs, sqrt}
 
-import Graphics3D.BaseObjects._
-import Graphics3D.Utils._
+import Graphics3D.Components._
+import Graphics3D.GeometryUtils._
 import Graphics3D.Materials.Matte
 
 case class Cylinder(height: Double, radius: Double,

@@ -1,12 +1,13 @@
 import Graphics3D._
-import Utils._, BaseObjects._, Colors._, Materials._, Noise._, Shapes._
+import GeometryUtils._, Components._, Colors._
+import Textures.NoiseFunctions._, Materials._, Shapes._
 
 object Scenes {
-  val perlinNoise = new NoiseDisplay(
+  val noise = new NoiseDisplay(
     imageWidth = 600,
     imageHeight = 600,
-    unitSizePx = 30,
-    noise = Noise.perlinNoise
+    unitSizePx = 60,
+    noise = unsignedNoise(perlin1986)
   )
 
   val testScene = new RayTracingScene(
@@ -97,12 +98,13 @@ object Scenes {
 
     shapes = List(
       NoisyShape(
+        material = Metal(DEEP_SKY_BLUE),
         shape = Torus(mainRadius = 5, tubeRadius = 3,
-          transformation = new Transformation(-50, 0, 0, 0, 0, 15),
-          material = Matte(DEEP_SKY_BLUE)
+          transformation = new Transformation(-50, 0, 0, 0, 0, 15)
         ),
-        noise = Noise.fractalNoise(Noise.perlinNoise)(),
-        noiseFrequency = 2
+        noise = unsignedNoise(perlin2002),
+        noiseFrequency = 2,
+        noiseAmplifier = 0.3
       )
     )
   )
@@ -133,6 +135,33 @@ object Scenes {
         cut = Box(
           lenX = 14, lenY = 7, lenZ = 7,
           transformation = new Transformation(-30, 0, 0, 10, 0, 27)
+        )
+      )
+    )
+  )
+
+  val intersectionShape = new RayMarchingScene(
+    imageWidth = 600,
+    imageHeight = 600,
+    softShadows = true,
+
+    lights = List(Light(-10, 0, 10, shadowSharpness = 5), Light(10, 30, 0, shadowSharpness = 5)),
+
+    shapes = List(
+      Plane(
+        point = Vec3(0, -8, 0),
+        normal = unitY,
+        material = Matte(YELLOW)
+      ),
+      Intersection(
+        material = Matte(DEEP_SKY_BLUE),
+        shape1 = Box(
+          lenX = 10, lenY = 10, lenZ = 3,
+          transformation = new Transformation(0, 50, 0, 0, 0, 10)
+        ),
+        shape2 = Sphere(
+          center = Vec3(0, 0, 10),
+          radius = 3
         )
       )
     )

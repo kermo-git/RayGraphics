@@ -1,8 +1,8 @@
 package Graphics3D.Materials
 
-import Graphics3D.BaseObjects._
+import Graphics3D.Components._
 import Graphics3D.Colors._
-import Graphics3D.Utils._
+import Graphics3D.GeometryUtils._
 
 case class Glass(color: Color = WHITE, ior: Double = 1.5, reflectivity: Double = 0) extends Material {
 

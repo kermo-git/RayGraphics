@@ -1,7 +1,7 @@
 package Graphics3D.Shapes
 
-import Graphics3D.BaseObjects._
-import Graphics3D.Utils._
+import Graphics3D.Components._
+import Graphics3D.GeometryUtils._
 import Graphics3D.Materials.Matte
 
 case class Sphere(center: Vec3, radius: Double,

@@ -3,7 +3,7 @@ package Graphics3D
 import scala.annotation.tailrec
 import scala.math.{abs, min}
 
-import BaseObjects._, Colors._, Utils._
+import Components._, Colors._, GeometryUtils._
 
 class RayMarchingScene(
   imageWidth: Int,

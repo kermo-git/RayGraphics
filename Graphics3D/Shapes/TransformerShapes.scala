@@ -2,10 +2,9 @@ package Graphics3D.Shapes
 
 import scala.math.{abs, max, min}
 
-import Graphics3D.Utils._
-import Graphics3D.BaseObjects._
+import Graphics3D.GeometryUtils._
+import Graphics3D.Components._
 import Graphics3D.Materials.Matte
-import Graphics3D.Noise.NoiseFunction
 
 case class NoisyShape(shape: RMShape, noise: NoiseFunction,
                       noiseFrequency: Double = 1,
@@ -13,10 +12,8 @@ case class NoisyShape(shape: RMShape, noise: NoiseFunction,
                       stepScale: Double = 0.5,
                       override val material: Material = Matte()) extends RMShape {
 
-  private val noiseMultiplier = noiseAmplifier / noiseFrequency
-
   override def getDistance(point: Vec3): Double =
-    (shape.getDistance(point) + noise(point * noiseFrequency) * noiseMultiplier) * stepScale
+    (shape.getDistance(point) + noise(point * noiseFrequency) * noiseAmplifier) * stepScale
 }
 
 case class Intersection(shape1: RMShape, shape2: RMShape,

@@ -3,7 +3,7 @@ import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-import Graphics3D.BaseObjects.Renderable
+import Graphics3D.Components.Renderable
 
 class Display(val image: BufferedImage) extends JPanel {
   override def paint(g: Graphics): Unit = {
@@ -30,7 +30,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    val image: BufferedImage = sceneToImage(Scenes.blendedShapes)
+    val image: BufferedImage = sceneToImage(Scenes.noisyShape)
     val frame = new JFrame
     frame.setTitle("3D Graphics")
     frame.setSize(image.getWidth, image.getHeight)

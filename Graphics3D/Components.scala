@@ -2,17 +2,41 @@ package Graphics3D
 
 import scala.math.{tan, toRadians}
 
-import Colors._, Utils._
+import Colors._, GeometryUtils._
 
-object BaseObjects {
-  case class Light(x: Double, y: Double, z: Double, color: Color = WHITE, shadowSharpness: Int = 20) {
-    val location: Vec3 = Vec3(x, y, z)
-  }
-
+object Components {
   trait Renderable {
     val imageWidth: Int
     val imageHeight: Int
     def getPixelColor(x: Int, y: Int): Color
+  }
+
+  type NoiseFunction = Vec3 => Double
+  type TextureFunction = Vec3 => Color
+
+  class NoiseDisplay(val imageWidth: Int,
+                     val imageHeight: Int,
+                     val unitSizePx: Int,
+                     val noise: NoiseFunction) extends Renderable {
+
+    override def getPixelColor(x: Int, y: Int): Color = {
+      val noiseX = 1.0 * x / unitSizePx
+      val noiseY = 1.0 * y / unitSizePx
+      val noiseValue = noise(Vec3(noiseX, noiseY, 0))
+      new Color(noiseValue, noiseValue, noiseValue)
+    }
+  }
+
+  class TextureDisplay(val imageWidth: Int,
+                       val imageHeight: Int,
+                       val unitSizePx: Int,
+                       val generator: TextureFunction) extends Renderable {
+
+    override def getPixelColor(x: Int, y: Int): Color = {
+      val noiseX = 1.0 * x / unitSizePx
+      val noiseY = 1.0 * y / unitSizePx
+      generator(Vec3(noiseX, noiseY, 0))
+    }
   }
 
   abstract class Scene[S <: Shape](
@@ -42,6 +66,10 @@ object BaseObjects {
     def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color
 
     def getShadow(point: Vec3, light: Light): Double
+  }
+
+  case class Light(x: Double, y: Double, z: Double, color: Color = WHITE, shadowSharpness: Int = 20) {
+    val location: Vec3 = Vec3(x, y, z)
   }
 
   trait Material {
