@@ -8,7 +8,7 @@ import Graphics3D.GeometryUtils._
 
 case class Metal(diffuse: Color = SILVER,
                  specular: Color = WHITE,
-                 shininess: Double = 0.5 * 128,
+                 shininess: Double = 64,
                  ior: Double = 1.3,
                  reflectivity: Double = 0) extends Material {
 

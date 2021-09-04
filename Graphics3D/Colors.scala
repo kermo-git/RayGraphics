@@ -23,32 +23,28 @@ object Colors {
     }
   }
 
-  val BLACK: Color = new Color(0x000000)
-  val GRAY: Color = new Color(0x808080)
-  val SILVER: Color = new Color(0xC0C0C0)
-  val LIGHT_GRAY: Color = new Color(0xD3D3D3)
-
-  val WHITE: Color = new Color(0xFFFFFF)
-  val IVORY: Color = new Color(0xFFFFF0)
-  val HONEYDEV: Color = new Color(0xF0FFF0)
-  val AZURE: Color = new Color(0x0FFFFF)
+  val MEDIUM_VIOLET_RED: Color = new Color(0xC71585)
+  val DEEP_PINK: Color = new Color(0xFF1493)
+  val HOT_PINK: Color = new Color(0xFF69B4)
 
   val RED: Color = new Color(0xFF0000)
   val FIREBRICK: Color = new Color(0x8B0000)
   val SALMON: Color = new Color(0xFA8072)
 
-  val HOT_PINK: Color = new Color(0xFF69B4)
-  val DEEP_PINK: Color = new Color(0xFF1493)
-  val MEDIUM_VIOLET_RED: Color = new Color(0xC71585)
+  val ORANGE_RED: Color = new Color(0xFF4500)
+  val ORANGE: Color = new Color(0xFFA500)
 
   val YELLOW: Color = new Color(0xFFFF00)
   val GOLD: Color = new Color(0xFFD700)
-  val ORANGE: Color = new Color(0xFFA500)
-  val ORANGE_RED: Color = new Color(0xFF4500)
+
+  val SADDLE_BROWN: Color = new Color(0x8B4513)
+  val PERU: Color = new Color(0xCD853F)
+  val TAN: Color = new Color(0xD2B48C)
+  val WHEAT: Color = new Color(0xF5DEB3)
 
   val GREEN: Color = new Color(0x008000)
-  val LAWN_GREEN: Color = new Color(0x7CFC00)
   val LIME: Color = new Color(0x00FF00)
+  val LAWN_GREEN: Color = new Color(0x7CFC00)
 
   val DARK_CYAN: Color = new Color(0x008B8B)
   val TURQUOISE: Color = new Color(0x40E0D0)
@@ -56,8 +52,8 @@ object Colors {
   val AQUAMARINE: Color = new Color(0x7FFFD4)
 
   val DARK_BLUE: Color = new Color(0x00008B)
-  val BLUE: Color = new Color(0x0000FF)
   val MEDIUM_BLUE: Color = new Color(0x0000CD)
+  val BLUE: Color = new Color(0x0000FF)
   val DEEP_SKY_BLUE: Color = new Color(0x00BFFF)
   val LIGHT_SKY_BLUE: Color = new Color(0x87CEFA)
 
@@ -66,4 +62,14 @@ object Colors {
   val DARK_VIOLET: Color = new Color(0x9400D3)
   val MAGENTA: Color = new Color(0xFF00FF)
   val MEDIUM_SLATE_BLUE: Color = new Color(0x7B68EE)
+
+  val HONEYDEV: Color = new Color(0xF0FFF0)
+  val AZURE: Color = new Color(0x0FFFFF)
+  val IVORY: Color = new Color(0xFFFFF0)
+  val WHITE: Color = new Color(0xFFFFFF)
+
+  val BLACK: Color = new Color(0x000000)
+  val GRAY: Color = new Color(0x808080)
+  val SILVER: Color = new Color(0xC0C0C0)
+  val LIGHT_GRAY: Color = new Color(0xD3D3D3)
 }

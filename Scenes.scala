@@ -8,6 +8,10 @@ import Materials._
 import Shapes._
 
 object Scenes {
+  val darkWood: TextureFunction = wood(absPerlinNoise)(10, 0.2)(BLACK, SADDLE_BROWN)
+  val lightWood: TextureFunction = wood(absPerlinNoise)(10, 0.2)(TAN, WHEAT)
+  val beautiful: TextureFunction = smoothColorBands(perlinNoise)(DARK_BLUE, MEDIUM_BLUE, DEEP_SKY_BLUE, MEDIUM_BLUE)
+
   val noise = new NoiseDisplay(
     imageWidth = 600,
     imageHeight = 600,
@@ -18,9 +22,9 @@ object Scenes {
   val texture = new TextureDisplay(
     imageWidth = 600,
     imageHeight = 600,
-    unitSizePx = 60,
-    noiseZ = 0.7,
-    texture = smoothColorBands(perlinNoise)(DARK_BLUE, MEDIUM_BLUE, DEEP_SKY_BLUE, MEDIUM_BLUE)// wood(perlinNoise)(20, 0.3)(BLACK, ORANGE_RED)
+    unitSizePx = 100,
+    noiseZ = 0.3,
+    texture = darkWood
   )
 
   val testScene = new RayTracingScene(
@@ -127,27 +131,32 @@ object Scenes {
     imageHeight = 600,
     softShadows = true,
 
-    lights = List(Light(20, 0, 20, shadowSharpness = 10)),
+    lights = List(Light(10, 0, 0, shadowSharpness = 10)),
 
     shapes = List(
       Plane(point = Vec3(0, -8, 0), normal = unitY, material = Matte(TURQUOISE)),
-      Cut(
-        material = Matte(GOLD),
-        shape = Blend(
-          smoothness = 3,
+      Blend(
+        smoothness = 5,
+        material = Texture(
+          textureFunction = beautiful,
+          textureScale = 0.5
+        ),
+
+        shape1 = Blend(
+          smoothness = 5,
           shape1 = Torus(
             mainRadius = 10,
             tubeRadius = 5,
-            transformation = new Transformation(-40, 0, 0, 10, 5, 40)
+            transformation = new Transformation(-40, 0, 0, -2, 5, 40)
           ),
           shape2 = Sphere(
-            center = Vec3(-7, 5, 40),
+            center = Vec3(-19, 5, 40),
             radius = 7
           )
         ),
-        cut = Box(
-          lenX = 14, lenY = 7, lenZ = 7,
-          transformation = new Transformation(-30, 0, 0, 10, 0, 27)
+        shape2 = Cylinder(
+          height = 20, radius = 7,
+          transformation = new Transformation(-50, 0, 0, 13, 5, 40)
         )
       )
     )
@@ -156,27 +165,36 @@ object Scenes {
   val intersectionShape = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
-    softShadows = true,
 
-    lights = List(Light(-10, 0, 10, shadowSharpness = 5), Light(10, 30, 0, shadowSharpness = 5)),
+    lights = List(
+      Light(0, 5, 0, shadowSharpness = 5, color = IVORY),
+      Light(0, 0, 20, shadowSharpness = 5, color = GRAY)
+    ),
 
     shapes = List(
       Plane(
         point = Vec3(0, -8, 0),
         normal = unitY,
-        material = Matte(YELLOW)
+        material = Texture(beautiful, textureScale = 0.5)
       ),
-      Intersection(
-        material = Matte(DEEP_SKY_BLUE),
-        shape1 = Box(
-          lenX = 10, lenY = 10, lenZ = 3,
-          transformation = new Transformation(0, 50, 0, 0, 0, 10)
+      Cut(
+        material = Texture(lightWood, textureScale = 0.3),
+        shape = Intersection(
+          shape1 = Box(
+            lenX = 10, lenY = 10, lenZ = 3,
+            transformation = new Transformation(0, 50, 0, 0, 0, 10)
+          ),
+          shape2 = Sphere(
+            center = Vec3(0, 0, 10),
+            radius = 3
+          )
         ),
-        shape2 = Sphere(
-          center = Vec3(0, 0, 10),
-          radius = 3
+        cut = Torus(
+          mainRadius = 3,
+          tubeRadius = 0.6,
+          transformation = new Transformation(-1, 0, 6)
         )
-      )
+      ),
     )
   )
 }
