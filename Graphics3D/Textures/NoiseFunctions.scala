@@ -1,21 +1,15 @@
 package Graphics3D.Textures
 
 import scala.annotation.tailrec
-import scala.math.abs
-
+import scala.math.{abs, cos}
 import Graphics3D._
 import Components.NoiseFunction
 import GeometryUtils.Vec3
-
-import NoiseUtils._
+import NoiseGenerator._
 
 object NoiseFunctions {
-  val perlin2002: NoiseFunction = perlin(perlin2002grad)(_)
-  val perlin1986: NoiseFunction = perlin(perlin1986grad)(_)
-
-  def unsignedNoise(signedNoise: NoiseFunction)(point: Vec3): Double = 0.5 * signedNoise(point) + 0.5
-
-  def turbulence(signedNoise: NoiseFunction)(point: Vec3): Double = abs(signedNoise(point))
+  def perlinNoise(point: Vec3): Double = 0.5 * signedPerlinNoise(point) + 0.5
+  def absPerlinNoise(point: Vec3): Double = abs(signedPerlinNoise(point))
 
   def fractalNoise(noiseFunction: NoiseFunction)(octaves: Int = 4, persistence: Double = 0.4)(point: Vec3): Double = {
     @tailrec
@@ -31,7 +25,6 @@ object NoiseFunctions {
           frequency = 2 * frequency
         )
     }
-
     octave()
   }
 }

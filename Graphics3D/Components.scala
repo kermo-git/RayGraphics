@@ -17,12 +17,13 @@ object Components {
   class NoiseDisplay(val imageWidth: Int,
                      val imageHeight: Int,
                      val unitSizePx: Int,
+                     val noiseZ: Double = 0,
                      val noise: NoiseFunction) extends Renderable {
 
     override def getPixelColor(x: Int, y: Int): Color = {
       val noiseX = 1.0 * x / unitSizePx
       val noiseY = 1.0 * y / unitSizePx
-      val noiseValue = noise(Vec3(noiseX, noiseY, 0))
+      val noiseValue = noise(Vec3(noiseX, noiseY, noiseZ))
       new Color(noiseValue, noiseValue, noiseValue)
     }
   }
@@ -30,12 +31,13 @@ object Components {
   class TextureDisplay(val imageWidth: Int,
                        val imageHeight: Int,
                        val unitSizePx: Int,
-                       val generator: TextureFunction) extends Renderable {
+                       val noiseZ: Double = 0,
+                       val texture: TextureFunction) extends Renderable {
 
     override def getPixelColor(x: Int, y: Int): Color = {
       val noiseX = 1.0 * x / unitSizePx
       val noiseY = 1.0 * y / unitSizePx
-      generator(Vec3(noiseX, noiseY, 0))
+      texture(Vec3(noiseX, noiseY, noiseZ))
     }
   }
 

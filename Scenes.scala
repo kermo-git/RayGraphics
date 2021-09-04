@@ -1,13 +1,26 @@
 import Graphics3D._
-import GeometryUtils._, Components._, Colors._
-import Textures.NoiseFunctions._, Materials._, Shapes._
+import GeometryUtils._
+import Components._
+import Colors._
+import Textures.TextureFunctions._
+import Textures.NoiseFunctions._
+import Materials._
+import Shapes._
 
 object Scenes {
   val noise = new NoiseDisplay(
     imageWidth = 600,
     imageHeight = 600,
+    unitSizePx = 30,
+    noise = perlinNoise
+  )
+
+  val texture = new TextureDisplay(
+    imageWidth = 600,
+    imageHeight = 600,
     unitSizePx = 60,
-    noise = unsignedNoise(perlin1986)
+    noiseZ = 0.7,
+    texture = smoothColorBands(perlinNoise)(DARK_BLUE, MEDIUM_BLUE, DEEP_SKY_BLUE, MEDIUM_BLUE)// wood(perlinNoise)(20, 0.3)(BLACK, ORANGE_RED)
   )
 
   val testScene = new RayTracingScene(
@@ -102,7 +115,7 @@ object Scenes {
         shape = Torus(mainRadius = 5, tubeRadius = 3,
           transformation = new Transformation(-50, 0, 0, 0, 0, 15)
         ),
-        noise = unsignedNoise(perlin2002),
+        noise = perlinNoise,
         noiseFrequency = 2,
         noiseAmplifier = 0.3
       )
