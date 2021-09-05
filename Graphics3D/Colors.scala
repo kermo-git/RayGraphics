@@ -42,7 +42,10 @@ object Colors {
   val TAN: Color = new Color(0xD2B48C)
   val WHEAT: Color = new Color(0xF5DEB3)
 
+  val DARK_GREEN: Color = new Color(0x006400)
   val GREEN: Color = new Color(0x008000)
+  val SEAGREEN: Color = new Color(0x2E8B57)
+  val OLIVE_DRAB: Color = new Color(0x6B8E23)
   val LIME: Color = new Color(0x00FF00)
   val LAWN_GREEN: Color = new Color(0x7CFC00)
 

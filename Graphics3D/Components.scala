@@ -31,28 +31,29 @@ object Components {
   class TextureDisplay(val imageWidth: Int,
                        val imageHeight: Int,
                        val unitSizePx: Int,
-                       val noiseZ: Double = 0,
+                       val textureZ: Double = 0,
                        val texture: TextureFunction) extends Renderable {
 
     override def getPixelColor(x: Int, y: Int): Color = {
-      val noiseX = 1.0 * x / unitSizePx
-      val noiseY = 1.0 * y / unitSizePx
-      texture(Vec3(noiseX, noiseY, noiseZ))
+      val textureX = 1.0 * x / unitSizePx
+      val textureY = 1.0 * y / unitSizePx
+      texture(Vec3(textureX, textureY, textureZ))
     }
   }
 
-  abstract class Scene[S <: Shape](
-    val imageWidth: Int,
-    val imageHeight: Int,
-    val FOVDegrees: Int,
+  abstract class Scene[S <: Shape](val imageWidth: Int,
+                                   val imageHeight: Int,
+                                   val FOVDegrees: Int,
 
-    val maxBounces: Int,
-    val rayHitBias: Double,
-    val renderShadows: Boolean,
+                                   val maxBounces: Int,
+                                   val rayHitBias: Double,
+                                   val renderShadows: Boolean,
 
-    val lights: List[Light],
-    val shapes: List[S]
-  ) extends Renderable {
+                                   val background: TextureFunction,
+                                   val backGroundScale: Double,
+
+                                   val lights: List[Light],
+                                   val shapes: List[S]) extends Renderable {
 
     def getPixelColor(x: Int, y: Int): Color = castRay(origin, getCameraRay(x, y))
 

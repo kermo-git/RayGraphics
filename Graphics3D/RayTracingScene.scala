@@ -4,20 +4,25 @@ import scala.annotation.tailrec
 
 import Components._, Colors._, GeometryUtils._
 
-class RayTracingScene(
-  imageWidth: Int,
-  imageHeight: Int,
-  FOVDegrees: Int = 70,
+class RayTracingScene(imageWidth: Int,
+                      imageHeight: Int,
+                      FOVDegrees: Int = 70,
 
-  maxBounces: Int = 5,
-  rayHitBias: Double = SURFACE_BIAS,
-  renderShadows: Boolean = true,
+                      maxBounces: Int = 5,
+                      rayHitBias: Double = SURFACE_BIAS,
+                      renderShadows: Boolean = true,
 
-  lights: List[Light],
-  shapes: List[RTShape]
-) extends Scene[RTShape](imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights, shapes) {
+                      background: TextureFunction = _ => BLACK,
+                      backGroundScale: Double = 1,
 
-  type ShapeHit = Option[(RTShape, Vec3, Double)]
+                      lights: List[Light],
+                      shapes: List[RTShape]
+                     )
+  extends Scene[RTShape](
+    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, background, backGroundScale, lights, shapes
+  ) {
+
+  type ShapeHit = Option[(Shape, Vec3, Double)]
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
     def testNextShape(prevHit: ShapeHit, nextShape: RTShape): ShapeHit = {
@@ -41,7 +46,7 @@ class RayTracingScene(
       }
     }
     shapes.foldLeft[ShapeHit](None)(testNextShape) match {
-      case None => BLACK
+      case None => background(direction * backGroundScale)
       case Some((shape, hitPoint, _)) =>
         val normal = shape.getNormal(hitPoint)
         val trueNormal = if ((direction dot normal) > 0) normal.invert else normal

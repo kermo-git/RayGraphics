@@ -5,25 +5,30 @@ import scala.math.{abs, min}
 
 import Components._, Colors._, GeometryUtils._
 
-class RayMarchingScene(
-  imageWidth: Int,
-  imageHeight: Int,
-  FOVDegrees: Int = 70,
+class RayMarchingScene(imageWidth: Int,
+                       imageHeight: Int,
+                       FOVDegrees: Int = 70,
 
-  maxBounces: Int = 5,
-  rayHitBias: Double = SURFACE_BIAS,
-  renderShadows: Boolean = true,
+                       maxBounces: Int = 5,
+                       rayHitBias: Double = SURFACE_BIAS,
+                       renderShadows: Boolean = true,
 
-  val maxDist: Double = 100,
-  val rayHitThreshold: Double = 0.001,
-  val softShadows: Boolean = false,
+                       val maxDist: Double = 100,
+                       val rayHitThreshold: Double = 0.001,
+                       val softShadows: Boolean = false,
 
-  lights: List[Light],
-  shapes: List[RMShape]
-) extends Scene[RMShape](imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights, shapes) {
+                       background: TextureFunction = _ => BLACK,
+                       backGroundScale: Double = 1,
 
-  type ShapeDist = Option[(RMShape, Double)]
-  type ShapeHit = Option[(RMShape, Vec3)]
+                       lights: List[Light],
+                       shapes: List[RMShape]
+                      )
+  extends Scene[RMShape](
+    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, background, backGroundScale, lights, shapes
+  ) {
+
+  type ShapeDist = Option[(Shape, Double)]
+  type ShapeHit = Option[(Shape, Vec3)]
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
 
@@ -44,11 +49,11 @@ class RayMarchingScene(
     }
 
     findHitPoint() match {
+      case None => background(direction * backGroundScale)
       case Some((shape, hitPoint)) =>
         val normal = shape.getNormal(hitPoint)
         val trueNormal = if ((direction dot normal) > 0) normal.invert else normal
         shape.material.shade(this, direction, hitPoint, trueNormal, depth, inside)
-      case None => BLACK
     }
   }
 

@@ -34,7 +34,7 @@ object NoiseGenerator {
     val Sy: Double = fade(py)
     val Sz: Double = fade(pz)
 
-    lerp(Sz,
+    val result = lerp(Sz,
       lerp(Sy,
         lerp(Sx, a, b),
         lerp(Sx, c, d)),
@@ -42,11 +42,11 @@ object NoiseGenerator {
         lerp(Sx, e, f),
         lerp(Sx, g, h)
       )
-    ) * NOISE_MULTIPLIER
+    ) * 1.1
+    if (result > 1) 1 else if (result < -1) -1 else result
   }
 
   val MASK: Int = 255
-  val NOISE_MULTIPLIER = 1.1
 
   def fade(t: Double): Double = t * t * t * (t * (t * 6 - 15) + 10)
 
