@@ -11,11 +11,12 @@ class RayMarchingScene(imageWidth: Int,
 
                        maxBounces: Int = 5,
                        rayHitBias: Double = SURFACE_BIAS,
+
                        renderShadows: Boolean = true,
+                       shadowStepMultiPlier: Double = 1,
 
                        val maxDist: Double = 100,
                        val rayHitThreshold: Double = 0.001,
-                       val softShadows: Boolean = false,
 
                        background: TextureFunction = _ => BLACK,
                        backGroundScale: Double = 1,
@@ -37,7 +38,7 @@ class RayMarchingScene(imageWidth: Int,
       if (traveledDist > maxDist) None
       else {
         val currentPos = origin + direction * traveledDist
-        findClosestObject(currentPos, shapes) match {
+        findClosestObject(currentPos) match {
           case Some((shape, distance)) =>
             if (distance < rayHitThreshold)
               Some((shape, currentPos))
@@ -66,18 +67,14 @@ class RayMarchingScene(imageWidth: Int,
     def doShadowRayMarching(traveledDist: Double = 0, shadowValue: Double = 1): Double = {
       if (traveledDist > distToLight) shadowValue
       else {
-        val currentPos = point + direction * traveledDist
-        findClosestObject(currentPos, shapes) match {
-          case Some((_, objDist)) =>
-            if (objDist < rayHitThreshold) 0
-            else doShadowRayMarching(
-              traveledDist = traveledDist + objDist,
-
-              shadowValue = if (softShadows)
-                min(shadowValue, light.shadowSharpness * objDist / traveledDist)
-              else
-                shadowValue
-            )
+        findClosestObject(point + direction * traveledDist) match {
+          case Some((_, sceneDist)) =>
+            if (sceneDist < rayHitThreshold) 0
+            else
+              doShadowRayMarching(
+                traveledDist = traveledDist + shadowStepMultiPlier * sceneDist,
+                shadowValue = min(shadowValue, light.shadowSharpness * sceneDist / traveledDist)
+              )
           case None => shadowValue
         }
       }
@@ -86,7 +83,7 @@ class RayMarchingScene(imageWidth: Int,
   }
 
   @tailrec
-  private def findClosestObject(viewPoint: Vec3, _shapes: List[RMShape], prevClosest: ShapeDist = None): ShapeDist = _shapes match {
+  private def findClosestObject(viewPoint: Vec3, _shapes: List[RMShape] = shapes, prevClosest: ShapeDist = None): ShapeDist = _shapes match {
     case shape :: tail =>
       val nextDist = abs(shape.getDistance(viewPoint))
       val nextResult = Some((shape, nextDist))
