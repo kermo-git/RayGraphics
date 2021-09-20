@@ -33,20 +33,29 @@ object Scenes {
     lights = List(Light(0, 0, 0)),
 
     shapes = List(
-      Plane(
-        point = Vec3(0, -8, 0),
-        material = Metal(HONEYDEV)
+      Blend(
+        smoothness = 5,
+        material = Metal(HONEYDEV),
+
+        shape1 = Plane(
+          point = Vec3(0, -8, 0)
+        ),
+        shape2 = Torus(
+          mainRadius = 10,
+          tubeRadius = 3,
+          transformation = new Transformation(10, -8, 30)
+        )
       ),
       Torus(
         mainRadius = 10,
         tubeRadius = 3,
         transformation = new Transformation(-30, 0, -30, -7, 5, 30),
-        material = Metal(LIGHT_SKY_BLUE)
+        material = Metal(DARK_CYAN)
       ),
       Sphere(
         center = Vec3(15, 5, 30),
         radius = 6,
-        material = Metal(AQUAMARINE)
+        material = Metal(DEEP_SKY_BLUE)
       )
     )
   )

@@ -3,10 +3,10 @@ import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
 
+import scala.annotation.tailrec
+
 import Graphics3D.GeometryUtils.Vec3
 import Graphics3D.Components._
-
-import scala.annotation.tailrec
 
 class Display(val image: BufferedImage) extends JPanel {
   override def paint(g: Graphics): Unit = {

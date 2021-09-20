@@ -8,7 +8,7 @@ import Graphics3D.GeometryUtils._
 
 case class Metal(diffuse: Color = SILVER,
                  specular: Color = WHITE,
-                 shininess: Double = 64,
+                 shininess: Double = 128,
                  ior: Double = 1.3,
                  reflectivity: Double = 0) extends Material {
 
@@ -23,13 +23,13 @@ case class Metal(diffuse: Color = SILVER,
       val shadow = if (scene.renderShadows) scene.getShadow(biasedHitPoint, light) else 1
       if (shadow > 0) {
 
-        val lightVec = new Vec3(light.location, hitPoint).normalize
-        val diffuseIntensity = -(lightVec dot normal)
+        val lightVec = new Vec3(hitPoint, light.location).normalize
+        val diffuseIntensity = lightVec dot normal
 
         if (diffuseIntensity > 0) {
           val diffuseColor = diffuse * light.color * diffuseIntensity * shadow
 
-          val specularIntensity = pow(reflection(lightVec, normal) dot incident, shininess)
+          val specularIntensity = pow((lightVec - incident).normalize dot normal, shininess)
           if (specularIntensity > 0)
             color + diffuseColor + (specular * light.color * specularIntensity * shadow)
           else

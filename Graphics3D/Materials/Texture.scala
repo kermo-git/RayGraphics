@@ -6,7 +6,7 @@ import Graphics3D.GeometryUtils._
 import Graphics3D.Colors.Color
 import Graphics3D.Components._
 
-case class Texture(textureFunction: TextureFunction, textureScale: Double, shininess: Double = 64) extends Material {
+case class Texture(textureFunction: TextureFunction, textureScale: Double, shininess: Double = 128) extends Material {
 
   override def shade[O <: Shape](
     scene: Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
@@ -18,13 +18,13 @@ case class Texture(textureFunction: TextureFunction, textureScale: Double, shini
       val shadow = if (scene.renderShadows) scene.getShadow(biasedHitPoint, light) else 1
       if (shadow > 0) {
 
-        val lightVec = new Vec3(light.location, hitPoint).normalize
-        val diffuseIntensity = -(lightVec dot normal)
+        val lightVec = new Vec3(hitPoint, light.location).normalize
+        val diffuseIntensity = lightVec dot normal
 
         if (diffuseIntensity > 0) {
           val diffuseColor = textureColor * light.color * diffuseIntensity * shadow
 
-          val specularIntensity = pow(reflection(lightVec, normal) dot incident, shininess)
+          val specularIntensity = pow((lightVec - incident).normalize dot normal, shininess)
           if (specularIntensity > 0)
             color + diffuseColor + (light.color * specularIntensity * shadow)
           else
