@@ -71,8 +71,8 @@ object Components {
     def getShadow(point: Vec3, light: Light): Double
   }
 
-  case class Light(x: Double, y: Double, z: Double, color: Color = WHITE, shadowSharpness: Int = 20) {
-    val location: Vec3 = Vec3(x, y, z)
+  case class Light(location: Vec3, color: Color = WHITE, intensity: Double = 1, shadowSharpness: Int = 20) {
+    val energy: Color = color * intensity
   }
 
   trait Material {

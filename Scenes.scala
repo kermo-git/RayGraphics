@@ -30,12 +30,14 @@ object Scenes {
     background = EXPLOSION,
     backGroundScale = 4,
 
-    lights = List(Light(0, 0, 0)),
+    lights = List(
+      Light(location = Vec3(0, 20, 30), intensity = 20000)
+    ),
 
     shapes = List(
       Blend(
         smoothness = 5,
-        material = Metal(HONEYDEV),
+        material = RealisticMatte(HONEYDEV),
 
         shape1 = Plane(
           point = Vec3(0, -8, 0)
@@ -50,12 +52,43 @@ object Scenes {
         mainRadius = 10,
         tubeRadius = 3,
         transformation = new Transformation(-30, 0, -30, -7, 5, 30),
-        material = Metal(DARK_CYAN)
+        material = RealisticMatte(DARK_CYAN)
       ),
       Sphere(
         center = Vec3(15, 5, 30),
         radius = 6,
-        material = Metal(DEEP_SKY_BLUE)
+        material = RealisticMatte(DEEP_SKY_BLUE)
+      )
+    )
+  )
+
+  val shadowScene = new RayMarchingScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    background = CLOUDS,
+    backGroundScale = 4,
+
+    lights = List(Light(location = Vec3(-40, 20, 30))),
+    shadowStepMultiPlier = 0.3,
+
+    shapes = List(
+      Plane(
+        point = Vec3(0, -8, 0)
+      ),
+      Cut(
+        material = Matte(GOLD),
+
+        shape = Box(
+          lenX = 10,
+          lenY = 30,
+          lenZ = 20,
+          transformation = new Transformation(0, 0, 0, -5, -8, 30)
+        ),
+        cut = Sphere(
+          center = Vec3(-5, -2, 30),
+          radius = 9
+        )
       )
     )
   )
