@@ -26,7 +26,7 @@ case class RealisticMatte(color: Color = LIGHT_GRAY) extends Material {
         if (diffuseIntensity > 0) {
           val lightDist = lightVec.length
           val falloff = 1 / (4 * Pi * lightDist * lightDist)
-          normColor * light.energy * falloff * diffuseIntensity * shadow
+          color + normColor * light.energy * falloff * diffuseIntensity * shadow
         } else color
       } else color
     }
