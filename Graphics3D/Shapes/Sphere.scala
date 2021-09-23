@@ -2,10 +2,9 @@ package Graphics3D.Shapes
 
 import Graphics3D.Components._
 import Graphics3D.Geometry._
-import Graphics3D.Materials.Phong
 
-case class Sphere(center: Vec3, radius: Double,
-                  override val material: Material = Phong()) extends RMShape with RTShape {
+case class Sphere[M](center: Vec3, radius: Double,
+                  override val material: M = null) extends RMShape[M] with RTShape[M] {
 
   val equationConst: Double = (center dot center) - radius * radius
 

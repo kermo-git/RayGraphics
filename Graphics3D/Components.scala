@@ -41,19 +41,9 @@ object Components {
     }
   }
 
-  abstract class Scene[S <: Shape](val imageWidth: Int,
-                                   val imageHeight: Int,
-                                   val FOVDegrees: Int,
-
-                                   val maxBounces: Int,
-                                   val rayHitBias: Double,
-                                   val renderShadows: Boolean,
-
-                                   val background: TextureFunction,
-                                   val backGroundScale: Double,
-
-                                   val lights: List[Light],
-                                   val shapes: List[S]) extends Renderable {
+  abstract class Scene(val imageWidth: Int,
+                       val imageHeight: Int,
+                       val FOVDegrees: Int) extends Renderable {
 
     def getPixelColor(x: Int, y: Int): Color = castRay(ORIGIN, getCameraRay(x, y))
 
@@ -67,30 +57,41 @@ object Components {
     }
 
     def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color
+  }
+
+  abstract class DirectLightScene(imageWidth: Int,
+                                  imageHeight: Int,
+                                  FOVDegrees: Int,
+
+                                  val maxBounces: Int,
+                                  val rayHitBias: Double,
+                                  val renderShadows: Boolean,
+
+                                  val lights: List[Light]) extends Scene(imageWidth, imageHeight, FOVDegrees) {
 
     def getShadow(point: Vec3, light: Light): Double
   }
 
-  case class Light(location: Vec3, color: Color = WHITE, intensity: Double = 1, shadowSharpness: Int = 20) {
+  case class Light(location: Vec3, color: Color = WHITE, intensity: Double = 50000, shadowSharpness: Int = 20) {
     val energy: Color = color * intensity
   }
 
   trait Material {
-    def shade[S <: Shape](scene: Scene[S], incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
+    def shade(scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
   }
 
   case class RayHit(hitPoint: Vec3, distFromOrigin: Double)
 
-  trait Shape {
-    val material: Material
+  trait Shape[M] {
+    val material: M
     def getNormal(point: Vec3): Vec3
   }
 
-  trait RTShape extends Shape {
+  trait RTShape[M] extends Shape[M] {
     def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit]
   }
 
-  trait OriginRTShape extends RTShape {
+  trait OriginRTShape[M] extends RTShape[M] {
     val transformation: Transformation
 
     def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit]
@@ -114,7 +115,7 @@ object Components {
     Vec3(0, 0, 0.001)
   )
 
-  trait RMShape extends Shape {
+  trait RMShape[M] extends Shape[M] {
     def getDistance(point: Vec3): Double
 
     override def getNormal(point: Vec3): Vec3 = {

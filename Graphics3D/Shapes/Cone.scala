@@ -4,11 +4,10 @@ import scala.math.{min, sqrt}
 
 import Graphics3D.Components._
 import Graphics3D.Geometry._
-import Graphics3D.Materials.Phong
 
-case class Cone(height: Double, radius: Double,
+case class Cone[M](height: Double, radius: Double,
                 override val transformation: Transformation,
-                override val material: Material = Phong()) extends OriginRTShape with RMShape {
+                override val material: M = null) extends OriginRTShape[M] with RMShape[M] {
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse

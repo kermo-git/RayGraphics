@@ -13,21 +13,22 @@ class RayMarchingScene(imageWidth: Int,
                        rayHitBias: Double = SURFACE_BIAS,
 
                        renderShadows: Boolean = true,
-                       shadowStepMultiPlier: Double = 1,
+                       val shadowStepMultiPlier: Double = 1,
 
                        val maxDist: Double = 100,
                        val rayHitThreshold: Double = 0.001,
 
-                       background: TextureFunction = _ => BLACK,
-                       backGroundScale: Double = 1,
+                       val background: TextureFunction = _ => BLACK,
+                       val backGroundScale: Double = 1,
 
                        lights: List[Light],
-                       shapes: List[RMShape]
+                       val shapes: List[RMShape[Material]]
                       )
-  extends Scene[RMShape](
-    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, background, backGroundScale, lights, shapes
+  extends DirectLightScene(
+    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights
   ) {
 
+  type Shape = RMShape[Material]
   type ShapeDist = Option[(Shape, Double)]
   type ShapeHit = Option[(Shape, Vec3)]
 
@@ -83,7 +84,7 @@ class RayMarchingScene(imageWidth: Int,
   }
 
   @tailrec
-  private def findClosestObject(viewPoint: Vec3, _shapes: List[RMShape] = shapes, prevClosest: ShapeDist = None): ShapeDist = _shapes match {
+  private def findClosestObject(viewPoint: Vec3, _shapes: List[Shape] = shapes, prevClosest: ShapeDist = None): ShapeDist = _shapes match {
     case shape :: tail =>
       val nextDist = abs(shape.getDistance(viewPoint))
       val nextResult = Some((shape, nextDist))

@@ -12,20 +12,21 @@ class RayTracingScene(imageWidth: Int,
                       rayHitBias: Double = SURFACE_BIAS,
                       renderShadows: Boolean = true,
 
-                      background: TextureFunction = _ => BLACK,
-                      backGroundScale: Double = 1,
+                      val background: TextureFunction = _ => BLACK,
+                      val backGroundScale: Double = 1,
 
                       lights: List[Light],
-                      shapes: List[RTShape]
+                      val shapes: List[RTShape[Material]]
                      )
-  extends Scene[RTShape](
-    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, background, backGroundScale, lights, shapes
+  extends DirectLightScene(
+    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights
   ) {
 
+  type Shape = RTShape[Material]
   type ShapeHit = Option[(Shape, Vec3, Double)]
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
-    def testNextShape(prevHit: ShapeHit, nextShape: RTShape): ShapeHit = {
+    def testNextShape(prevHit: ShapeHit, nextShape: Shape): ShapeHit = {
 
       val newHit = nextShape.getRayHit(origin, direction)
 
@@ -60,7 +61,7 @@ class RayTracingScene(imageWidth: Int,
     val shadowRayDirection = pointToLight.normalize
 
     @tailrec
-    def shadowTest(_shapes: List[RTShape]): Double = _shapes match {
+    def shadowTest(_shapes: List[Shape]): Double = _shapes match {
       case Nil => 1
       case shape :: tail => shape.getRayHit(light.location, shadowRayDirection) match {
         case None => shadowTest(tail)

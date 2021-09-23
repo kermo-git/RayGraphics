@@ -4,11 +4,10 @@ import scala.math.{abs, max, sqrt}
 
 import Graphics3D.Components._
 import Graphics3D.Geometry._
-import Graphics3D.Materials.Phong
 
-case class Box(lenX: Double, lenY: Double, lenZ: Double,
+case class Box[M](lenX: Double, lenY: Double, lenZ: Double,
                override val transformation: Transformation,
-               override val material: Material = Phong()) extends OriginRTShape with RMShape {
+               override val material: M = null) extends OriginRTShape[M] with RMShape[M] {
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse

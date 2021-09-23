@@ -6,8 +6,8 @@ import Graphics3D.Geometry._
 
 case class Glass(color: Color = WHITE, ior: Double = 1.5, reflectivity: Double = 0) extends Material {
 
-  override def shade[O <: Shape](
-    scene: Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean
+  override def shade(
+    scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean
   ): Color = {
 
     if (recDepth > scene.maxBounces) BLACK

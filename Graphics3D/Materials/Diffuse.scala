@@ -10,8 +10,8 @@ case class Diffuse(color: Color = LIGHT_GRAY) extends Material {
 
   val normColor: Color = color * (1 / Pi)
 
-  override def shade[O <: Shape](
-    scene: Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
+  override def shade(
+    scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
   ): Color = {
     val biasedHitPoint = hitPoint + normal * scene.rayHitBias
 

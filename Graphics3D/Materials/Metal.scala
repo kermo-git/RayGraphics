@@ -14,8 +14,8 @@ case class Metal(diffuse: Color = SILVER,
 
   private val ambient = diffuse * 0.1
 
-  override def shade[O <: Shape](
-    scene: Scene[O], incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
+  override def shade(
+    scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
   ): Color = {
     val biasedHitPoint = hitPoint + normal * scene.rayHitBias
 
