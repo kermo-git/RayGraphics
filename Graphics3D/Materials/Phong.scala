@@ -4,9 +4,9 @@ import scala.math.pow
 
 import Graphics3D.Components._
 import Graphics3D.Colors._
-import Graphics3D.GeometryUtils._
+import Graphics3D.Geometry._
 
-case class Matte(diffuse: Color = LIGHT_GRAY, specular: Color = WHITE, shininess: Double = 128) extends Material {
+case class Phong(diffuse: Color = LIGHT_GRAY, specular: Color = WHITE, shininess: Double = 128) extends Material {
 
   private val ambient = diffuse * 0.1
 

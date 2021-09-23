@@ -1,5 +1,5 @@
 import Graphics3D._
-import GeometryUtils._
+import Geometry._
 import Components._
 import Colors._
 import Textures.SampleTextures._
@@ -23,7 +23,37 @@ object Scenes {
     texture = FIRE
   )
 
-  val testScene = new RayMarchingScene(
+  val testScene1 = new RayTracingScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    lights = List(
+      Light(location = Vec3(-14, 14, 0), intensity = 40000),
+      Light(location = Vec3(14, 10, 0), intensity = 40000)
+    ),
+
+    shapes = List(
+      Cone(height = 15, radius = 7,
+        transformation = new Transformation(7, -15, 29),
+        material = Diffuse(FIREBRICK)
+      ),
+      Sphere(
+        center = Vec3(-5, 0, 22),
+        radius = 5,
+        material = Diffuse(DARK_CYAN)
+      ),
+      Cylinder(height = 20, radius = 6,
+        transformation = new Transformation(-88.2, -36, 0, 4, 7, 39),
+        material = Diffuse(SEAGREEN)
+      ),
+      Box(lenX = 30, lenY = 30, lenZ = 50,
+        transformation = new Transformation(0, 0, 24),
+        material = Diffuse(GOLD)
+      )
+    )
+  )
+
+  val testScene2 = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
 
@@ -37,7 +67,7 @@ object Scenes {
     shapes = List(
       Blend(
         smoothness = 5,
-        material = RealisticMatte(HONEYDEV),
+        material = Metal(HONEYDEV),
 
         shape1 = Plane(
           point = Vec3(0, -8, 0)
@@ -52,12 +82,12 @@ object Scenes {
         mainRadius = 10,
         tubeRadius = 3,
         transformation = new Transformation(-30, 0, -30, -7, 5, 30),
-        material = RealisticMatte(DARK_CYAN)
+        material = Metal(DARK_CYAN)
       ),
       Sphere(
         center = Vec3(15, 5, 30),
         radius = 6,
-        material = RealisticMatte(DEEP_SKY_BLUE)
+        material = Metal(DEEP_SKY_BLUE)
       )
     )
   )
@@ -77,7 +107,7 @@ object Scenes {
         point = Vec3(0, -8, 0)
       ),
       Cut(
-        material = Matte(GOLD),
+        material = Phong(GOLD),
 
         shape = Box(
           lenX = 10,

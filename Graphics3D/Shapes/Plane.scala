@@ -1,11 +1,11 @@
 package Graphics3D.Shapes
 
 import Graphics3D.Components._
-import Graphics3D.GeometryUtils._
-import Graphics3D.Materials.Matte
+import Graphics3D.Geometry._
+import Graphics3D.Materials.Phong
 
-case class Plane(point: Vec3 = origin, normal: Vec3 = unitY,
-                 override val material: Material = Matte()) extends RTShape with RMShape {
+case class Plane(point: Vec3 = ORIGIN, normal: Vec3 = UNIT_Y,
+                 override val material: Material = Phong()) extends RTShape with RMShape {
 
   private val planeBias = point dot normal
 

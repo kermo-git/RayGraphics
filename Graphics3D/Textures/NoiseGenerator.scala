@@ -1,7 +1,7 @@
 package Graphics3D.Textures
 
 import scala.util.Random
-import Graphics3D.GeometryUtils.Vec3
+import Graphics3D.Geometry.Vec3
 
 object NoiseGenerator {
   def signedPerlinNoise(point: Vec3): Double = {

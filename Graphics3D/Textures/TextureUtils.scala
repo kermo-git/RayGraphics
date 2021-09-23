@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.math.{abs, min}
 
 import Graphics3D.Components.NoiseFunction
-import Graphics3D.GeometryUtils.Vec3
+import Graphics3D.Geometry.Vec3
 import Graphics3D.Colors.Color
 import NoiseGenerator._
 

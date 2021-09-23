@@ -1,6 +1,6 @@
 package Graphics3D.Textures
 
-import Graphics3D.GeometryUtils.Vec3
+import Graphics3D.Geometry.Vec3
 import Graphics3D.Colors._
 import Graphics3D.Components.TextureFunction
 import Graphics3D.Textures.TextureUtils._

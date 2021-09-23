@@ -4,7 +4,7 @@ import scala.math.pow
 
 import Graphics3D.Components._
 import Graphics3D.Colors._
-import Graphics3D.GeometryUtils._
+import Graphics3D.Geometry._
 
 case class Metal(diffuse: Color = SILVER,
                  specular: Color = WHITE,

@@ -1,12 +1,12 @@
 package Graphics3D.Materials
 
-import scala.math.{pow, Pi}
+import scala.math.Pi
 
 import Graphics3D.Components._
 import Graphics3D.Colors._
-import Graphics3D.GeometryUtils._
+import Graphics3D.Geometry._
 
-case class RealisticMatte(color: Color = LIGHT_GRAY) extends Material {
+case class Diffuse(color: Color = LIGHT_GRAY) extends Material {
 
   val normColor: Color = color * (1 / Pi)
 

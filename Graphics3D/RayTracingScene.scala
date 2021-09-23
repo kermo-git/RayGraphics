@@ -2,7 +2,7 @@ package Graphics3D
 
 import scala.annotation.tailrec
 
-import Components._, Colors._, GeometryUtils._
+import Components._, Colors._, Geometry._
 
 class RayTracingScene(imageWidth: Int,
                       imageHeight: Int,

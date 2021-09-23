@@ -5,7 +5,7 @@ import javax.swing.JPanel
 
 import scala.annotation.tailrec
 
-import Graphics3D.GeometryUtils.Vec3
+import Graphics3D.Geometry.Vec3
 import Graphics3D.Components._
 
 class Display(val image: BufferedImage) extends JPanel {
@@ -57,7 +57,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    val image: BufferedImage = renderImage(Scenes.testScene)
+    val image: BufferedImage = renderImage(Scenes.testScene1)
     val frame = new JFrame
     frame.setTitle("3D Graphics")
     frame.setSize(image.getWidth, image.getHeight)

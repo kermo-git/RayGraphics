@@ -3,12 +3,12 @@ package Graphics3D.Shapes
 import scala.math.{abs, max, sqrt}
 
 import Graphics3D.Components._
-import Graphics3D.GeometryUtils._
-import Graphics3D.Materials.Matte
+import Graphics3D.Geometry._
+import Graphics3D.Materials.Phong
 
 case class Box(lenX: Double, lenY: Double, lenZ: Double,
                override val transformation: Transformation,
-               override val material: Material = Matte()) extends OriginRTShape with RMShape {
+               override val material: Material = Phong()) extends OriginRTShape with RMShape {
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse
@@ -16,7 +16,7 @@ case class Box(lenX: Double, lenY: Double, lenZ: Double,
     val absX = abs(t.x) + SURFACE_BIAS
     val absZ = abs(t.z) + SURFACE_BIAS
 
-    val normal = if (absX < maxX) { if (absZ < maxZ) unitY else unitZ } else unitX
+    val normal = if (absX < maxX) { if (absZ < maxZ) UNIT_Y else UNIT_Z } else UNIT_X
 
     normal * transformation.rotation
   }

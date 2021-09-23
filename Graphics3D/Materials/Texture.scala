@@ -2,7 +2,7 @@ package Graphics3D.Materials
 
 import scala.math.pow
 
-import Graphics3D.GeometryUtils._
+import Graphics3D.Geometry._
 import Graphics3D.Colors.Color
 import Graphics3D.Components._
 

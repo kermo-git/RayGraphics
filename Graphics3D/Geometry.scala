@@ -1,11 +1,12 @@
 package Graphics3D
 
-import scala.math.{cos, sin, sqrt, toRadians}
+import scala.util.Random
+import scala.math.{cos, sin, sqrt, toRadians, random}
 
-object GeometryUtils {
+object Geometry {
   type Matrix = Array[Array[Double]]
 
-  val identMat: Matrix = Array(
+  val IDENTITY_MATRIX: Matrix = Array(
     Array(1, 0, 0, 0),
     Array(0, 1, 0, 0),
     Array(0, 0, 1, 0),
@@ -39,6 +40,22 @@ object GeometryUtils {
     Array(0, 0, 1, 0),
     Array(x, y, z, 1),
   )
+
+  def coordinateSystem(yAxis: Vec3): Matrix = {
+    val xAxis = if (yAxis.x > yAxis.y)
+      Vec3(yAxis.z, 0, -yAxis.x).normalize
+    else {
+      Vec3(0, -yAxis.z, yAxis.y).normalize
+    }
+    val zAxis = xAxis cross yAxis
+
+    Array(
+      Array(xAxis.x, xAxis.y, xAxis.z, 0),
+      Array(yAxis.x, yAxis.y, yAxis.z, 0),
+      Array(zAxis.x, zAxis.y, zAxis.z, 0),
+      Array(0,       0,       0,       1),
+    )
+  }
 
   implicit class MatrixOps(mat: Matrix) {
     def *(other: Matrix): Matrix = {
@@ -101,10 +118,22 @@ object GeometryUtils {
     def invert: Vec3 = Vec3(-x, -y, -z)
   }
 
-  val origin: Vec3 = Vec3(0, 0, 0)
-  val unitX: Vec3 = Vec3(1, 0, 0)
-  val unitY: Vec3 = Vec3(0, 1, 0)
-  val unitZ: Vec3 = Vec3(0, 0, 1)
+  val ORIGIN: Vec3 = Vec3(0, 0, 0)
+  val UNIT_X: Vec3 = Vec3(1, 0, 0)
+  val UNIT_Y: Vec3 = Vec3(0, 1, 0)
+  val UNIT_Z: Vec3 = Vec3(0, 0, 1)
+
+  private lazy val HEMISPHERE_VECTORS: Seq[Vec3] = {
+    def randSigned: Double = 2 * random() - 1
+    def randVector: Vec3 = Vec3(randSigned, random(), randSigned)
+
+    (for (_ <- 0 to 200) yield randVector)
+      .filter(vec => vec.length <= 1)
+      .map(vec => vec.normalize)
+  }
+
+  def randHemisphereVector(normal: Vec3): Vec3 =
+    HEMISPHERE_VECTORS(Random.nextInt(HEMISPHERE_VECTORS.length)) * coordinateSystem(normal)
 
   def solveQuadraticEquation(a: Double, b: Double, c: Double): Option[(Double, Double)] = {
     val D = b * b - 4 * a * c

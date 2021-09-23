@@ -3,17 +3,17 @@ package Graphics3D.Shapes
 import scala.math.{min, sqrt}
 
 import Graphics3D.Components._
-import Graphics3D.GeometryUtils._
-import Graphics3D.Materials.Matte
+import Graphics3D.Geometry._
+import Graphics3D.Materials.Phong
 
 case class Cone(height: Double, radius: Double,
                 override val transformation: Transformation,
-                override val material: Material = Matte()) extends OriginRTShape with RMShape {
+                override val material: Material = Phong()) extends OriginRTShape with RMShape {
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse
 
-    val normal = if (t.y - SURFACE_BIAS < 0) unitY else {
+    val normal = if (t.y - SURFACE_BIAS < 0) UNIT_Y else {
       val radiusVec = Vec3(t.x, 0, t.z).normalize
       Vec3(radiusVec.x, normalTan, radiusVec.z).normalize
     }

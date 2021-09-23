@@ -3,12 +3,12 @@ package Graphics3D.Shapes
 import scala.math.{abs, sqrt}
 
 import Graphics3D.Components._
-import Graphics3D.GeometryUtils._
-import Graphics3D.Materials.Matte
+import Graphics3D.Geometry._
+import Graphics3D.Materials.Phong
 
 case class Cylinder(height: Double, radius: Double,
                     override val transformation: Transformation,
-                    override val material: Material = Matte()) extends OriginRTShape with RMShape {
+                    override val material: Material = Phong()) extends OriginRTShape with RMShape {
 
   private val (rSqr, minY, maxY) = (radius * radius, -0.5 * height, 0.5 * height)
 
@@ -17,7 +17,7 @@ case class Cylinder(height: Double, radius: Double,
 
     val normal =
       if (t.y - SURFACE_BIAS < minY || t.y + SURFACE_BIAS > maxY)
-        unitY
+        UNIT_Y
       else
         Vec3(t.x, 0, t.z).normalize
 

@@ -2,7 +2,7 @@ package Graphics3D
 
 import scala.math.{tan, toRadians}
 
-import Colors._, GeometryUtils._
+import Colors._, Geometry._
 
 object Components {
   trait Renderable {
@@ -55,7 +55,7 @@ object Components {
                                    val lights: List[Light],
                                    val shapes: List[S]) extends Renderable {
 
-    def getPixelColor(x: Int, y: Int): Color = castRay(origin, getCameraRay(x, y))
+    def getPixelColor(x: Int, y: Int): Color = castRay(ORIGIN, getCameraRay(x, y))
 
     private val imagePlaneWidth = 2 * tan(toRadians(FOVDegrees / 2))
     private val imagePlaneHeight = imagePlaneWidth * imageHeight / imageWidth
