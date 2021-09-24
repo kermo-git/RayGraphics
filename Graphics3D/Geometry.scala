@@ -1,7 +1,7 @@
 package Graphics3D
 
 import scala.util.Random
-import scala.math.{cos, sin, sqrt, toRadians, random}
+import scala.math.{cos, sin, sqrt, abs, toRadians, random}
 
 object Geometry {
   type Matrix = Array[Array[Double]]
@@ -42,7 +42,7 @@ object Geometry {
   )
 
   def coordinateSystem(yAxis: Vec3): Matrix = {
-    val xAxis = if (yAxis.x > yAxis.y)
+    val xAxis = if (abs(yAxis.x) > abs(yAxis.y))
       Vec3(yAxis.z, 0, -yAxis.x).normalize
     else {
       Vec3(0, -yAxis.z, yAxis.y).normalize
@@ -127,13 +127,20 @@ object Geometry {
     def randSigned: Double = 2 * random() - 1
     def randVector: Vec3 = Vec3(randSigned, random(), randSigned)
 
-    (for (_ <- 0 to 200) yield randVector)
+    (for (_ <- 0 to 10000) yield randVector)
       .filter(vec => vec.length <= 1)
       .map(vec => vec.normalize)
   }
 
-  def randHemisphereVector(normal: Vec3): Vec3 =
-    HEMISPHERE_VECTORS(Random.nextInt(HEMISPHERE_VECTORS.length)) * coordinateSystem(normal)
+  def randHemisphereVector(normal: Vec3): Vec3 = {
+    // HEMISPHERE_VECTORS(Random.nextInt(HEMISPHERE_VECTORS.length)) * coordinateSystem(normal)
+    val bound = HEMISPHERE_VECTORS.length
+    val randIndex = Random.nextInt(bound)
+    val randVector = HEMISPHERE_VECTORS(randIndex)
+    val mat = coordinateSystem(normal)
+    val result = randVector * mat
+    result
+  }
 
   def solveQuadraticEquation(a: Double, b: Double, c: Double): Option[(Double, Double)] = {
     val D = b * b - 4 * a * c

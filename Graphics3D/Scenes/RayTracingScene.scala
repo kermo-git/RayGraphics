@@ -25,7 +25,6 @@ class RayTracingScene(imageWidth: Int,
   ) {
 
   type Shape = RTShape[Material]
-  type ShapeDist = Option[(Shape, Double)]
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
     trace[Material](shapes, origin, direction) match {

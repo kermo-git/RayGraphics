@@ -2,7 +2,7 @@ import Graphics3D._
 import Geometry._
 import Components._
 import Colors._
-import Graphics3D.Scenes.{RayMarchingScene, RayTracingScene}
+import Graphics3D.Scenes.{MonteCarloScene, RayMarchingScene, RayTracingScene}
 import Textures.SampleTextures._
 import Textures.TextureUtils._
 import Materials._
@@ -24,7 +24,7 @@ object Scenes {
     texture = FIRE
   )
 
-  val testScene1 = new RayTracingScene(
+  val rayTracingTest = new RayTracingScene(
     imageWidth = 600,
     imageHeight = 600,
 
@@ -53,7 +53,7 @@ object Scenes {
     )
   )
 
-  val testScene2 = new RayMarchingScene(
+  val rayMarchingTest = new RayMarchingScene(
     imageWidth = 600,
     imageHeight = 600,
 
@@ -92,33 +92,45 @@ object Scenes {
     )
   )
 
-  val shadowScene = new RayMarchingScene(
+  val MCfurnaceTest = new MonteCarloScene(
     imageWidth = 600,
     imageHeight = 600,
 
-    background = CLOUDS,
-    backGroundScale = 4,
-
-    lights = List(PointLight(location = Vec3(-40, 20, 30))),
-    shadowStepMultiPlier = 0.3,
+    samplesPerPixel = 100,
+    background = _ => WHITE,
 
     shapes = List(
-      Plane(
-        point = Vec3(0, -8, 0)
-      ),
-      Cut(
-        material = Phong(GOLD),
+      Sphere(
+        center = Vec3(0, 0, 20),
+        radius = 5,
+        material = MCDiffuse(MEDIUM_BLUE)
+      )
+    )
+  )
 
-        shape = Box(
-          lenX = 10,
-          lenY = 30,
-          lenZ = 20,
-          transformation = new Transformation(0, 0, 0, -5, -8, 30)
-        ),
-        cut = Sphere(
-          center = Vec3(-5, -2, 30),
-          radius = 9
-        )
+  val MCcornellBox = new MonteCarloScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    samplesPerPixel = 120,
+    maxBounces = 5,
+
+    shapes = List(
+      Box(lenX = 30, lenY = 30, lenZ = 40,
+        transformation = new Transformation(0, 0, 19),
+        material = MCDiffuse(LIGHT_GRAY)
+      ),
+      Box(lenX = 30, lenY = 30, lenZ = 40,
+        transformation = new Transformation(0, 29, 19),
+        material = MCLight(WHITE, 2)
+      ),
+      Box(lenX = 10, lenY = 20, lenZ = 10,
+        transformation = new Transformation(0, -20, 0, 7, -5, 35),
+        material = MCDiffuse(RED)
+      ),
+      Box(lenX = 10, lenY = 20, lenZ = 10,
+        transformation = new Transformation(0, 20, 0, -5, -5, 30),
+        material = MCDiffuse(LAWN_GREEN)
       )
     )
   )

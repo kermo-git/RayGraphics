@@ -13,7 +13,6 @@ case class Box[M](lenX: Double, lenY: Double, lenZ: Double, transformation: Tran
 
     val absX = abs(t.x) + SURFACE_BIAS
     val absZ = abs(t.z) + SURFACE_BIAS
-
     val normal = if (absX < maxX) { if (absZ < maxZ) UNIT_Y else UNIT_Z } else UNIT_X
 
     normal * transformation.rotation
@@ -31,8 +30,8 @@ case class Box[M](lenX: Double, lenY: Double, lenZ: Double, transformation: Tran
     else
       sqrt(
         max(0, distX) * distX +
-          max(0, distY) * distY +
-          max(0, distZ) * distZ
+        max(0, distY) * distY +
+        max(0, distZ) * distZ
       )
   }
 
