@@ -5,9 +5,8 @@ import scala.math.{abs, max, sqrt}
 import Graphics3D.Components._
 import Graphics3D.Geometry._
 
-case class Box[M](lenX: Double, lenY: Double, lenZ: Double,
-               override val transformation: Transformation,
-               override val material: M = null) extends OriginRTShape[M] with RMShape[M] {
+case class Box[M](lenX: Double, lenY: Double, lenZ: Double, transformation: Transformation,
+                  override val material: M = null) extends RTShape[M] with RMShape[M] {
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse
@@ -18,28 +17,6 @@ case class Box[M](lenX: Double, lenY: Double, lenZ: Double,
     val normal = if (absX < maxX) { if (absZ < maxZ) UNIT_Y else UNIT_Z } else UNIT_X
 
     normal * transformation.rotation
-  }
-
-  override def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit] = {
-
-    def testNextSide(prevHit: Option[RayHit], nextTest: HitTest): Option[RayHit] = {
-      val distance = nextTest.getHitDist(origin, direction)
-
-      if (distance < 0)
-        prevHit
-      else prevHit match {
-        case None => nextTest.getHit(origin, direction, distance)
-        case Some(RayHit(_, prevDist)) =>
-          if (distance < prevDist)
-            nextTest.getHit(origin, direction, distance) match {
-              case None => prevHit
-              case x => x
-            }
-          else
-            prevHit
-      }
-    }
-    tests.foldLeft[Option[RayHit]](None)(testNextSide)
   }
 
   override def getDistance(point: Vec3): Double = {
@@ -54,9 +31,34 @@ case class Box[M](lenX: Double, lenY: Double, lenZ: Double,
     else
       sqrt(
         max(0, distX) * distX +
-        max(0, distY) * distY +
-        max(0, distZ) * distZ
+          max(0, distY) * distY +
+          max(0, distZ) * distZ
       )
+  }
+
+  override def getRayHitDist(worldOrigin: Vec3, worldDirection: Vec3): Option[Double] = {
+    val (origin, direction) = (
+      worldOrigin * transformation.fullInverse,
+      worldDirection * transformation.rotationInverse
+    )
+    def testNextSide(prevHit: Option[Double], nextTest: HitTest): Option[Double] = {
+      val distance = nextTest.getHitDist(origin, direction)
+
+      if (distance < 0)
+        prevHit
+      else prevHit match {
+        case None => nextTest.getHit(origin, direction, distance)
+        case Some(prevDist) =>
+          if (distance < prevDist)
+            nextTest.getHit(origin, direction, distance) match {
+              case None => prevHit
+              case x => x
+            }
+          else
+            prevHit
+      }
+    }
+    tests.foldLeft[Option[Double]](None)(testNextSide)
   }
 
   private val (maxX, maxY, maxZ, minX, minY, minZ) = (
@@ -77,16 +79,15 @@ case class Box[M](lenX: Double, lenY: Double, lenZ: Double,
   private abstract class HitTest {
     def getHitDist(origin: Vec3, direction: Vec3): Double
     def inBounds(hitPoint: Vec3): Boolean
-    def getHit(origin: Vec3, direction: Vec3, distance: Double): Option[RayHit] = {
-      val hit = origin + direction * distance
-      if (inBounds(hit))
-        Some(RayHit(hit, distance))
+    def getHit(origin: Vec3, direction: Vec3, distance: Double): Option[Double] = {
+      if (inBounds(origin + direction * distance))
+        Some(distance)
       else
         None
     }
   }
 
-  private case class HitTestX(xPlanePos: Double) extends HitTest{
+  private case class HitTestX(xPlanePos: Double) extends HitTest {
     def getHitDist(origin: Vec3, direction: Vec3): Double = (xPlanePos - origin.x) / direction.x
     def inBounds(hitPoint: Vec3): Boolean =
       hitPoint.y >= minY && hitPoint.y <= maxY &&

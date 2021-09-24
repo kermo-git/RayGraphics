@@ -1,9 +1,11 @@
-package Graphics3D
+package Graphics3D.Scenes
+
+import Graphics3D.Colors.{BLACK, Color}
+import Graphics3D.Components._
+import Graphics3D.Geometry.Vec3
 
 import scala.annotation.tailrec
 import scala.math.{abs, min}
-
-import Components._, Colors._, Geometry._
 
 class RayMarchingScene(imageWidth: Int,
                        imageHeight: Int,
@@ -21,10 +23,10 @@ class RayMarchingScene(imageWidth: Int,
                        val background: TextureFunction = _ => BLACK,
                        val backGroundScale: Double = 1,
 
-                       lights: List[Light],
+                       lights: List[PointLight],
                        val shapes: List[RMShape[Material]]
                       )
-  extends DirectLightScene(
+  extends PointLightScene(
     imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights
   ) {
 
@@ -59,7 +61,7 @@ class RayMarchingScene(imageWidth: Int,
     }
   }
 
-  override def getShadow(point: Vec3, light: Light): Double = {
+  override def getShadow(point: Vec3, light: PointLight): Double = {
     val pointToLight = new Vec3(point, light.location)
     val distToLight = pointToLight.length
     val direction = pointToLight.normalize

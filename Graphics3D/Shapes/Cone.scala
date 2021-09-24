@@ -5,9 +5,10 @@ import scala.math.{min, sqrt}
 import Graphics3D.Components._
 import Graphics3D.Geometry._
 
-case class Cone[M](height: Double, radius: Double,
-                override val transformation: Transformation,
-                override val material: M = null) extends OriginRTShape[M] with RMShape[M] {
+case class Cone[M](height: Double, radius: Double, transformation: Transformation,
+                   override val material: M = null) extends RTShape[M] with RMShape[M] {
+
+  private val normalTan = radius / height
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse
@@ -17,67 +18,6 @@ case class Cone[M](height: Double, radius: Double,
       Vec3(radiusVec.x, normalTan, radiusVec.z).normalize
     }
     normal * transformation.rotation
-  }
-
-  private val hSqr_div_rSqr = (height * height) / (radius * radius)
-  private val _2h = 2 * height
-  private val hSqr = height * height
-  private val normalTan = radius / height
-
-  def getConeHit(origin: Vec3, direction: Vec3, distance: Double): Option[RayHit] = {
-    if (distance < 0)
-      None
-    else {
-      val hitPoint = origin + direction * distance
-      if (hitPoint.y < 0 || hitPoint.y > height)
-        None
-      else {
-        Some(RayHit(hitPoint, distance))
-      }
-    }
-  }
-
-  override def getRayHitAtObjectSpace(o: Vec3, d: Vec3): Option[RayHit] = {
-    val a = (d.x * d.x + d.z * d.z) * hSqr_div_rSqr - d.y * d.y
-    val b = 2 * ((o.x * d.x + o.z * d.z) * hSqr_div_rSqr - (o.y - height) * d.y)
-    val c = (o.x * o.x + o.z * o.z) * hSqr_div_rSqr - o.y * o.y + _2h * o.y - hSqr
-
-    val coneHit: Option[RayHit] = solveQuadraticEquation(a, b, c) match {
-      case None => None
-      case Some((x1, x2)) =>
-        val (nearDist, farDist) = if (x1 < x2) (x1, x2) else (x2, x1)
-        if (farDist > 0) {
-          getConeHit(o, d, nearDist) match {
-            case None => getConeHit(o, d, farDist)
-            case nearHit => nearHit
-          }
-        }
-        else None
-    }
-    val bottomDist = -o.y / d.y
-    if (bottomDist < 0)
-      coneHit
-    else {
-      val bottomHitPoint = o + d * bottomDist
-      val bottomHitRadius = sqrt(
-        bottomHitPoint.x * bottomHitPoint.x +
-        bottomHitPoint.z * bottomHitPoint.z
-      )
-      if (bottomHitRadius > radius)
-        coneHit
-      else {
-        val bottomHit = Some(RayHit(bottomHitPoint, bottomDist))
-
-        coneHit match {
-          case None => bottomHit
-          case Some(RayHit(_, coneDist)) =>
-            if (coneDist > bottomDist)
-              bottomHit
-            else
-              coneHit
-        }
-      }
-    }
   }
 
   private val k = -height / radius
@@ -112,13 +52,70 @@ case class Cone[M](height: Double, radius: Double,
       else {
         val c = Vec3(xc, yc, 0)
         val distance = new Vec3(c, p).length
-        val coneHeight = k * xp + height
 
-        if (yp < coneHeight)
+        if (yp < k * xp + height)
           -min(yp, distance)
         else
           distance
       }
     }
   }
+
+  override def getRayHitDist(worldOrigin: Vec3, worldDirection: Vec3): Option[Double] = {
+    val (origin, direction) = (
+      worldOrigin * transformation.fullInverse,
+      worldDirection * transformation.rotationInverse
+    )
+    val coneHit: Option[Double] = getConeHitDist(origin, direction)
+
+    val bottomDist = -origin.y / direction.y
+    if (bottomDist < 0)
+      coneHit
+    else {
+      val bottomHitPoint = origin + direction * bottomDist
+      val bottomHitRadius = sqrt(
+        bottomHitPoint.x * bottomHitPoint.x +
+        bottomHitPoint.z * bottomHitPoint.z
+      )
+      if (bottomHitRadius > radius)
+        coneHit
+      else {
+        val bottomHit = Some(bottomDist)
+
+        coneHit match {
+          case None => bottomHit
+          case Some(coneDist) =>
+            if (coneDist > bottomDist)
+              bottomHit
+            else
+              coneHit
+        }
+      }
+    }
+  }
+
+  private val hSqr_div_rSqr = (height * height) / (radius * radius)
+  private val h2 = 2 * height
+  private val hSqr = height * height
+
+  private def getConeHitDist(o: Vec3, d: Vec3): Option[Double] = {
+    val a = (d.x * d.x + d.z * d.z) * hSqr_div_rSqr - d.y * d.y
+    val b = 2 * ((o.x * d.x + o.z * d.z) * hSqr_div_rSqr - (o.y - height) * d.y)
+    val c = (o.x * o.x + o.z * o.z) * hSqr_div_rSqr - o.y * o.y + h2 * o.y - hSqr
+
+    solveQuadraticEquation(a, b, c) match {
+      case None => None
+      case Some((x1, x2)) =>
+        val (nearDist, farDist) = if (x1 < x2) (x1, x2) else (x2, x1)
+
+        if (nearDist > 0 && isValidConeHit(o + d * nearDist))
+          Some(nearDist)
+        else if (farDist > 0 && isValidConeHit(o + d * farDist))
+          Some(farDist)
+        else
+          None
+    }
+  }
+
+  private def isValidConeHit(point: Vec3): Boolean = point.y > 0 && point.y < height
 }

@@ -7,28 +7,22 @@ import Graphics3D.Geometry._
 case class Glass(color: Color = WHITE, ior: Double = 1.5, reflectivity: Double = 0) extends Material {
 
   override def shade(
-    scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean
+    scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean
   ): Color = {
 
     if (recDepth > scene.maxBounces) BLACK
     else {
       val hitPointOffset = normal * scene.rayHitBias
-      val reflectedRay = reflection(incident, normal)
-      val reflectionColor = scene.castRay(hitPoint + hitPointOffset, reflectedRay, recDepth + 1)
+      val reflectionColor = scene.castRay(hitPoint + hitPointOffset, reflection(incident, normal), recDepth + 1, inside)
 
-      val refractedRay = if (inside)
-        refraction(incident, normal, ior, 1)
-      else
-        refraction(incident, normal, 1, ior)
+      val (n1, n2) = if (inside) (ior, 1.0) else (1.0, ior)
 
-      val result = refractedRay match {
+      val result = refraction(incident, normal, n1, n2) match {
         case None => reflectionColor
         case Some(ray) =>
-          val reflectionRatio = if (inside)
-            reflectivity + (1 - reflectivity) * schlick(ior, 1, -(ray dot normal))
-          else
-            reflectivity + (1 - reflectivity) * schlick(1, ior, -(incident dot normal))
+          val cos = if (inside) -(ray dot normal) else -(incident dot normal)
 
+          val reflectionRatio = reflectivity + (1 - reflectivity) * schlick(n1, n2, cos)
           val refractionColor = scene.castRay(hitPoint - hitPointOffset, ray, recDepth + 1, !inside)
           reflectionColor * reflectionRatio + refractionColor * (1 - reflectionRatio)
       }

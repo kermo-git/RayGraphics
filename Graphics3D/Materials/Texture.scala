@@ -9,12 +9,12 @@ import Graphics3D.Components._
 case class Texture(textureFunction: TextureFunction, textureScale: Double, shininess: Double = 128) extends Material {
 
   override def shade(
-    scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
+    scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
   ): Color = {
     val biasedHitPoint = hitPoint + normal * scene.rayHitBias
     val textureColor = textureFunction(hitPoint * textureScale)
 
-    def addLight(color: Color, light: Light): Color = {
+    def addLight(color: Color, light: PointLight): Color = {
       val shadow = if (scene.renderShadows) scene.getShadow(biasedHitPoint, light) else 1
       if (shadow > 0) {
 

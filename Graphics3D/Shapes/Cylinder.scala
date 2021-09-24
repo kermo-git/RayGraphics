@@ -5,9 +5,8 @@ import scala.math.{abs, sqrt}
 import Graphics3D.Components._
 import Graphics3D.Geometry._
 
-case class Cylinder[M](height: Double, radius: Double,
-                    override val transformation: Transformation,
-                    override val material: M = null) extends OriginRTShape[M] with RMShape[M] {
+case class Cylinder[M](height: Double, radius: Double, transformation: Transformation,
+                    override val material: M = null) extends RTShape[M] with RMShape[M] {
 
   private val (rSqr, minY, maxY) = (radius * radius, -0.5 * height, 0.5 * height)
 
@@ -23,7 +22,11 @@ case class Cylinder[M](height: Double, radius: Double,
     normal * transformation.rotation
   }
 
-  override def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit] = {
+  override def getRayHitDist(worldOrigin: Vec3, worldDirection: Vec3): Option[Double] = {
+    val (origin, direction) = (
+      worldOrigin * transformation.fullInverse,
+      worldDirection * transformation.rotationInverse
+    )
     val a = direction.x * direction.x + direction.z * direction.z
     val b = 2 * (origin.x * direction.x + origin.z * direction.z)
     val c = origin.x * origin.x + origin.z * origin.z - rSqr
@@ -36,13 +39,7 @@ case class Cylinder[M](height: Double, radius: Double,
         if (high < 0)
           None
         else {
-          def capHit(capY: Double): Option[RayHit] = {
-            val distance = (capY - origin.y) / direction.y
-            val hitPoint = origin + direction * distance
-            Some(RayHit(hitPoint, distance))
-          }
-
-          def sideHit(distance: Double): Option[RayHit] = Some(RayHit(origin + direction * distance, distance))
+          def capHit(capY: Double): Option[Double] = Some((capY - origin.y) / direction.y)
 
           val nearSideHitY = origin.y + low * direction.y
           val farSideHitY = origin.y + high * direction.y
@@ -62,9 +59,9 @@ case class Cylinder[M](height: Double, radius: Double,
           else if (above && nearSideHitY > maxY && farSideHitY < maxY)
             capHit(maxY)
           else if (!inside && nearSideHitY >= minY && nearSideHitY <= maxY)
-            sideHit(low)
+            Some(low)
           else if (inside)
-            sideHit(high)
+            Some(high)
           else None
         }
     }

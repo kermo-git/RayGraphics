@@ -2,6 +2,7 @@ import Graphics3D._
 import Geometry._
 import Components._
 import Colors._
+import Graphics3D.Scenes.{RayMarchingScene, RayTracingScene}
 import Textures.SampleTextures._
 import Textures.TextureUtils._
 import Materials._
@@ -28,27 +29,26 @@ object Scenes {
     imageHeight = 600,
 
     lights = List(
-      Light(location = Vec3(-14, 14, 0), intensity = 40000),
-      Light(location = Vec3(14, 10, 0), intensity = 40000)
+      PointLight(location = Vec3(-14, 14, 0), intensity = 40000)
     ),
 
     shapes = List(
       Cone(height = 15, radius = 7,
         transformation = new Transformation(7, -15, 29),
-        material = Diffuse(FIREBRICK)
+        material = Phong(FIREBRICK)
       ),
       Sphere(
         center = Vec3(-5, 0, 22),
         radius = 5,
-        material = Diffuse(DARK_CYAN)
+        material = Glass()
       ),
       Cylinder(height = 20, radius = 6,
         transformation = new Transformation(-88.2, -36, 0, 4, 7, 39),
-        material = Diffuse(SEAGREEN)
+        material = Phong(SEAGREEN)
       ),
       Box(lenX = 30, lenY = 30, lenZ = 50,
         transformation = new Transformation(0, 0, 24),
-        material = Diffuse(GOLD)
+        material = Phong(GOLD)
       )
     )
   )
@@ -61,7 +61,7 @@ object Scenes {
     backGroundScale = 4,
 
     lights = List(
-      Light(location = Vec3(0, 20, 30), intensity = 20000)
+      PointLight(location = Vec3(0, 20, 30), intensity = 20000)
     ),
 
     shapes = List(
@@ -99,7 +99,7 @@ object Scenes {
     background = CLOUDS,
     backGroundScale = 4,
 
-    lights = List(Light(location = Vec3(-40, 20, 30))),
+    lights = List(PointLight(location = Vec3(-40, 20, 30))),
     shadowStepMultiPlier = 0.3,
 
     shapes = List(

@@ -59,25 +59,33 @@ object Components {
     def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color
   }
 
-  abstract class DirectLightScene(imageWidth: Int,
-                                  imageHeight: Int,
-                                  FOVDegrees: Int,
+  abstract class PointLightScene(imageWidth: Int,
+                                 imageHeight: Int,
+                                 FOVDegrees: Int,
 
-                                  val maxBounces: Int,
-                                  val rayHitBias: Double,
-                                  val renderShadows: Boolean,
+                                 val maxBounces: Int,
+                                 val rayHitBias: Double,
+                                 val renderShadows: Boolean,
 
-                                  val lights: List[Light]) extends Scene(imageWidth, imageHeight, FOVDegrees) {
+                                 val lights: List[PointLight]) extends Scene(imageWidth, imageHeight, FOVDegrees) {
 
-    def getShadow(point: Vec3, light: Light): Double
+    def getShadow(point: Vec3, light: PointLight): Double
   }
 
-  case class Light(location: Vec3, color: Color = WHITE, intensity: Double = 50000, shadowSharpness: Int = 20) {
+  case class PointLight(location: Vec3, color: Color = WHITE,
+                        intensity: Double = 50000,
+                        shadowSharpness: Int = 20) {
     val energy: Color = color * intensity
   }
 
   trait Material {
-    def shade(scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
+    def shade(scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
+  }
+
+  sealed trait MCMaterial
+  case class MCDiffuse(color: Color = LIGHT_GRAY) extends MCMaterial
+  case class MCLight(color: Color = WHITE, intensity: Double) extends MCMaterial {
+    val energy: Color = color * intensity
   }
 
   case class RayHit(hitPoint: Vec3, distFromOrigin: Double)
@@ -88,23 +96,27 @@ object Components {
   }
 
   trait RTShape[M] extends Shape[M] {
-    def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit]
+    def getRayHitDist(origin: Vec3, direction: Vec3): Option[Double]
   }
 
-  trait OriginRTShape[M] extends RTShape[M] {
-    val transformation: Transformation
+  type RTShapeHit[M] = Option[(RTShape[M], Double)]
 
-    def getRayHitAtObjectSpace(origin: Vec3, direction: Vec3): Option[RayHit]
-
-    override def getRayHit(origin: Vec3, direction: Vec3): Option[RayHit] =
-      getRayHitAtObjectSpace(
-        origin * transformation.fullInverse,
-        direction * transformation.rotationInverse
-      ) match {
-        case Some(RayHit(hitPoint, dist)) =>
-          Some(RayHit(hitPoint * transformation.full, dist))
-        case None => None
+  def trace[M](shapes: List[RTShape[M]], origin: Vec3, direction: Vec3): RTShapeHit[M] = {
+    shapes.foldLeft[RTShapeHit[M]](None)((prevResult, nextShape) => {
+      nextShape.getRayHitDist(origin, direction) match {
+        case None => prevResult
+        case Some(nextDist) =>
+          val nextResult = Some((nextShape, nextDist))
+          prevResult match {
+            case None => nextResult
+            case Some((_, prevDist)) =>
+              if (prevDist < nextDist)
+                prevResult
+              else
+                nextResult
+          }
       }
+    })
   }
 
   val SURFACE_BIAS = 0.005

@@ -11,11 +11,11 @@ case class Phong(diffuse: Color = LIGHT_GRAY, specular: Color = WHITE, shininess
   private val ambient = diffuse * 0.1
 
   override def shade(
-    scene: DirectLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
+    scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
   ): Color = {
     val biasedHitPoint = hitPoint + normal * scene.rayHitBias
 
-    def addLight(color: Color, light: Light): Color = {
+    def addLight(color: Color, light: PointLight): Color = {
       val shadow = if (scene.renderShadows) scene.getShadow(biasedHitPoint, light) else 1
       if (shadow > 0) {
 
