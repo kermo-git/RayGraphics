@@ -2,17 +2,23 @@ package Graphics3D.Materials
 
 import scala.math.pow
 
-import Graphics3D.Components._
-import Graphics3D.Colors._
 import Graphics3D.Geometry._
+import Graphics3D.Color, Color._
+import Graphics3D.Components._
 
-case class Phong(diffuse: Color = LIGHT_GRAY, specular: Color = WHITE, shininess: Double = 128) extends Material {
+case class Phong(diffuse: Color = LIGHT_GRAY,
+                 specular: Color = WHITE,
+                 shininess: Double = 128) extends Material {
 
   private val ambient = diffuse * 0.1
 
-  override def shade(
-    scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
-  ): Color = {
+  override def shade(scene: PointLightScene,
+                     incident: Vec3,
+                     hitPoint: Vec3,
+                     normal: Vec3,
+                     depth: Int,
+                     inside: Boolean): Color = {
+
     val biasedHitPoint = hitPoint + normal * scene.rayHitBias
 
     def addLight(color: Color, light: PointLight): Color = {

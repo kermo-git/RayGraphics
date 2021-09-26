@@ -3,9 +3,9 @@ package Graphics3D.Textures
 import scala.annotation.tailrec
 import scala.math.{abs, min}
 
-import Graphics3D.Components.NoiseFunction
 import Graphics3D.Geometry.Vec3
-import Graphics3D.Colors.Color
+import Graphics3D.Color, Color.blendColors
+import Graphics3D.Components.NoiseFunction
 import NoiseGenerator._
 
 object TextureUtils {
@@ -46,10 +46,4 @@ object TextureUtils {
     val bumpsValue = perlinNoise(point * Vec3(50, 10, 50))
     blendColors(darkColor, lightColor, min(1, woodValue - woodValue.toInt + bumpsValue))
   }
-
-  def blendColors(color1: Color, color2: Color, ratio: Double): Color = new Color(
-    lerp(ratio, color1.red, color2.red),
-    lerp(ratio, color1.green, color2.green),
-    lerp(ratio, color1.blue, color2.blue)
-  )
 }

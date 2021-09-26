@@ -123,24 +123,24 @@ object Geometry {
   val UNIT_Y: Vec3 = Vec3(0, 1, 0)
   val UNIT_Z: Vec3 = Vec3(0, 0, 1)
 
-  private lazy val HEMISPHERE_VECTORS: Seq[Vec3] = {
+  private lazy val UNIT_VECTORS: Seq[Vec3] = {
     def randSigned: Double = 2 * random() - 1
-    def randVector: Vec3 = Vec3(randSigned, random(), randSigned)
+    def randVector: Vec3 = Vec3(randSigned, randSigned, randSigned)
 
     (for (_ <- 0 to 10000) yield randVector)
       .filter(vec => vec.length <= 1)
       .map(vec => vec.normalize)
   }
 
-  def randHemisphereVector(normal: Vec3): Vec3 = {
-    // HEMISPHERE_VECTORS(Random.nextInt(HEMISPHERE_VECTORS.length)) * coordinateSystem(normal)
-    val bound = HEMISPHERE_VECTORS.length
-    val randIndex = Random.nextInt(bound)
-    val randVector = HEMISPHERE_VECTORS(randIndex)
-    val mat = coordinateSystem(normal)
-    val result = randVector * mat
-    result
-  }
+  def randUnitVector: Vec3 = UNIT_VECTORS(Random.nextInt(UNIT_VECTORS.length))
+
+  def lerp(a: Double, b: Double, t: Double): Double = a + t * (b - a)
+
+  def mix(vec1: Vec3, vec2: Vec3, weight: Double): Color = new Color(
+    lerp(vec1.x, vec2.x, weight),
+    lerp(vec1.y, vec2.y, weight),
+    lerp(vec1.z, vec2.z, weight)
+  )
 
   def solveQuadraticEquation(a: Double, b: Double, c: Double): Option[(Double, Double)] = {
     val D = b * b - 4 * a * c

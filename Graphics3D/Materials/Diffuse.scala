@@ -2,17 +2,21 @@ package Graphics3D.Materials
 
 import scala.math.Pi
 
-import Graphics3D.Components._
-import Graphics3D.Colors._
 import Graphics3D.Geometry._
+import Graphics3D.Color, Color._
+import Graphics3D.Components._
 
 case class Diffuse(color: Color = LIGHT_GRAY) extends Material {
 
   val normColor: Color = color * (1 / Pi)
 
-  override def shade(
-    scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, depth: Int, inside: Boolean
-  ): Color = {
+  override def shade(scene: PointLightScene,
+                     incident: Vec3,
+                     hitPoint: Vec3,
+                     normal: Vec3,
+                     depth: Int,
+                     inside: Boolean): Color = {
+
     val biasedHitPoint = hitPoint + normal * scene.rayHitBias
 
     def addLight(color: Color, light: PointLight): Color = {

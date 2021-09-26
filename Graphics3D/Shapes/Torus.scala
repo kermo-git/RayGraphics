@@ -2,8 +2,8 @@ package Graphics3D.Shapes
 
 import scala.math.sqrt
 
-import Graphics3D.Components._
 import Graphics3D.Geometry._
+import Graphics3D.Components._
 
 case class Torus[M](mainRadius: Double, tubeRadius: Double, transformation: Transformation,
                  override val material: M = null) extends RMShape[M] {

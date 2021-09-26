@@ -2,8 +2,8 @@ package Graphics3D.Shapes
 
 import scala.math.{abs, max, sqrt}
 
-import Graphics3D.Components._
 import Graphics3D.Geometry._
+import Graphics3D.Components._
 
 case class Box[M](lenX: Double, lenY: Double, lenZ: Double, transformation: Transformation,
                   override val material: M = null) extends RTShape[M] with RMShape[M] {

@@ -2,7 +2,7 @@ package Graphics3D
 
 import scala.math.{tan, toRadians}
 
-import Colors._, Geometry._
+import Geometry._, Color._
 
 object Components {
   trait Renderable {
@@ -80,12 +80,6 @@ object Components {
 
   trait Material {
     def shade(scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
-  }
-
-  sealed trait MCMaterial
-  case class MCDiffuse(color: Color = LIGHT_GRAY) extends MCMaterial
-  case class MCLight(color: Color = WHITE, intensity: Double) extends MCMaterial {
-    val energy: Color = color * intensity
   }
 
   case class RayHit(hitPoint: Vec3, distFromOrigin: Double)

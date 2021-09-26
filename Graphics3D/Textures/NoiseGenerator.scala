@@ -1,7 +1,7 @@
 package Graphics3D.Textures
 
 import scala.util.Random
-import Graphics3D.Geometry.Vec3
+import Graphics3D.Geometry.{Vec3, lerp}
 
 object NoiseGenerator {
   def signedPerlinNoise(point: Vec3): Double = {
@@ -34,23 +34,22 @@ object NoiseGenerator {
     val Sy: Double = fade(py)
     val Sz: Double = fade(pz)
 
-    val result = lerp(Sz,
-      lerp(Sy,
-        lerp(Sx, a, b),
-        lerp(Sx, c, d)),
-      lerp(Sy,
-        lerp(Sx, e, f),
-        lerp(Sx, g, h)
-      )
-    ) * 1.1
+    val result = 1.1 * lerp(
+      lerp(
+        lerp(a, b, Sx),
+        lerp(c, d, Sx), Sy
+      ),
+      lerp(
+        lerp(e, f, Sx),
+        lerp(g, h, Sx), Sy
+      ), Sz
+    )
     if (result > 1) 1 else if (result < -1) -1 else result
   }
 
   val MASK: Int = 255
 
   def fade(t: Double): Double = t * t * t * (t * (t * 6 - 15) + 10)
-
-  def lerp(t: Double, a: Double, b: Double): Double = a + t * (b - a)
 
   def floor(t: Double): Int = if (t >= 0) t.toInt else t.toInt - 1
 

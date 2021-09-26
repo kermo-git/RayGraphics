@@ -1,27 +1,35 @@
 package Graphics3D
 
-object Colors {
-  class Color(val red: Double, val green: Double, val blue: Double) {
-    def this(hex: Int) {
-      this(
-        ((hex >> 16) & 0xFF) / 255.0,
-        ((hex >> 8) & 0xFF) / 255.0,
-        (hex & 0xFF) / 255.0
-      )
-    }
+import Graphics3D.Geometry.lerp
 
-    def +(v: Color): Color = new Color(red + v.red, green + v.green, blue + v.blue)
-    def *(v: Color): Color = new Color(red * v.red, green * v.green, blue * v.blue)
-    def *(s: Double): Color = new Color(s * red, s * green, s * blue)
-
-    def toHex: Int = {
-      val r = if (red > 1) 1 else red
-      val g = if (green > 1) 1 else green
-      val b = if (blue > 1) 1 else blue
-
-      ((r * 255).toInt << 16) | ((g * 255).toInt << 8) | (b * 255).toInt
-    }
+class Color(val red: Double, val green: Double, val blue: Double) {
+  def this(hex: Int) {
+    this(
+      ((hex >> 16) & 0xFF) / 255.0,
+      ((hex >> 8) & 0xFF) / 255.0,
+      (hex & 0xFF) / 255.0
+    )
   }
+
+  def +(v: Color): Color = new Color(red + v.red, green + v.green, blue + v.blue)
+  def *(v: Color): Color = new Color(red * v.red, green * v.green, blue * v.blue)
+  def *(s: Double): Color = new Color(s * red, s * green, s * blue)
+
+  def toInt: Int = {
+    val r = if (red > 1) 1 else red
+    val g = if (green > 1) 1 else green
+    val b = if (blue > 1) 1 else blue
+
+    ((r * 255).toInt << 16) | ((g * 255).toInt << 8) | (b * 255).toInt
+  }
+}
+
+object Color {
+  def blendColors(color1: Color, color2: Color, ratio: Double): Color = new Color(
+    lerp(color1.red, color2.red, ratio),
+    lerp(color1.green, color2.green, ratio),
+    lerp(color1.blue, color2.blue, ratio)
+  )
 
   val MEDIUM_VIOLET_RED: Color = new Color(0xC71585)
   val DEEP_PINK: Color = new Color(0xFF1493)

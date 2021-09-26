@@ -2,8 +2,8 @@ package Graphics3D.Shapes
 
 import scala.math.{abs, sqrt}
 
-import Graphics3D.Components._
 import Graphics3D.Geometry._
+import Graphics3D.Components._
 
 case class Cylinder[M](height: Double, radius: Double, transformation: Transformation,
                     override val material: M = null) extends RTShape[M] with RMShape[M] {

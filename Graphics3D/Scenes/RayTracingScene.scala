@@ -1,10 +1,10 @@
 package Graphics3D.Scenes
 
-import Graphics3D.Colors.{BLACK, Color}
-import Graphics3D.Components._
-import Graphics3D.Geometry.Vec3
-
 import scala.annotation.tailrec
+
+import Graphics3D.Geometry.Vec3
+import Graphics3D.Color, Color.BLACK
+import Graphics3D.Components._
 
 class RayTracingScene(imageWidth: Int,
                       imageHeight: Int,
@@ -27,7 +27,7 @@ class RayTracingScene(imageWidth: Int,
   type Shape = RTShape[Material]
 
   override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
-    trace[Material](shapes, origin, direction) match {
+    trace(shapes, origin, direction) match {
       case None => background(direction * backGroundScale)
       case Some((shape, distance)) =>
         val hitPoint = origin + direction * distance

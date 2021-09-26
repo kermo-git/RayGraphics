@@ -1,12 +1,13 @@
 import Graphics3D._
+
 import Geometry._
+import Color._
 import Components._
-import Colors._
-import Graphics3D.Scenes.{MonteCarloScene, RayMarchingScene, RayTracingScene}
 import Textures.SampleTextures._
 import Textures.TextureUtils._
 import Materials._
 import Shapes._
+import Graphics3D.Scenes._
 
 object Scenes {
   val noise = new NoiseDisplay(
@@ -108,30 +109,166 @@ object Scenes {
     )
   )
 
-  val MCcornellBox = new MonteCarloScene(
+  val cornellBox = new MonteCarloScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    samplesPerPixel = 1000,
+    maxBounces = 5,
+
+    shapes = List(
+      // WALLS
+      Plane(
+        point = Vec3(-15, 0, 0),
+        normal = UNIT_X,
+        material = MCDiffuse(RED)
+      ),
+      Plane(
+        point = Vec3(15, 0, 0),
+        normal = UNIT_X,
+        material = MCDiffuse(LIME)
+      ),
+      Plane(
+        point = Vec3(0, 0, -1),
+        normal = UNIT_Z,
+        material = MCDiffuse(WHITE)
+      ),
+      Plane(
+        point = Vec3(0, 0, 40),
+        normal = UNIT_Z,
+        material = MCDiffuse(WHITE)
+      ),
+      Plane(
+        point = Vec3(0, 15, 0),
+        normal = UNIT_Y,
+        material = MCDiffuse(WHITE)
+      ),
+      Plane(
+        point = Vec3(0, -15, 0),
+        normal = UNIT_Y,
+        material = MCDiffuse(WHITE)
+      ),
+
+      // LIGHT SOURCE
+      Box(lenX = 10, lenY = 30, lenZ = 10,
+        transformation = new Transformation(0, 29, 30),
+        material = AreaLight(WHITE, intensity = 6)
+      ),
+
+      // OBJECTS
+
+      Box(lenX = 10, lenY = 20, lenZ = 7,
+        transformation = new Transformation(0, -30, 0, -6, -7, 34),
+        material = MCDiffuse(WHITE)
+      ),
+      Box(lenX = 10, lenY = 10, lenZ = 7,
+        transformation = new Transformation(0, 30, 0, 6, -10, 30),
+        material = MCDiffuse(WHITE)
+      )
+    )
+  )
+
+  val cornellBoxBalls = new MonteCarloScene(
+    imageWidth = 600,
+    imageHeight = 600,
+
+    samplesPerPixel = 1000,
+    maxBounces = 5,
+
+    shapes = List(
+      // WALLS
+      Plane(
+        point = Vec3(-15, 0, 0),
+        normal = UNIT_X,
+        material = MCDiffuse(RED)
+      ),
+      Plane(
+        point = Vec3(15, 0, 0),
+        normal = UNIT_X,
+        material = MCDiffuse(LIME)
+      ),
+      Plane(
+        point = Vec3(0, 0, -1),
+        normal = UNIT_Z,
+        material = MCDiffuse(WHITE)
+      ),
+      Plane(
+        point = Vec3(0, 0, 30),
+        normal = UNIT_Z,
+        material = MCDiffuse(WHITE)
+      ),
+      Plane(
+        point = Vec3(0, 15, 0),
+        normal = UNIT_Y,
+        material = MCDiffuse(WHITE)
+      ),
+      Plane(
+        point = Vec3(0, -15, 0),
+        normal = UNIT_Y,
+        material = MCDiffuse(WHITE)
+      ),
+
+      // LIGHT SOURCE
+      Box(lenX = 10, lenY = 30, lenZ = 10,
+        transformation = new Transformation(0, 29.5, 25),
+        material = AreaLight(WHITE, intensity = 8)
+      ),
+
+      // OBJECTS
+
+      Sphere(
+        center = Vec3(-11, -11, 26),
+        radius = 4,
+        material = MCDiffuse(AQUAMARINE)
+      ),
+      Sphere(
+        center = Vec3(0, -11, 26),
+        radius = 4,
+        material = MCDiffuse(GOLD)
+      ),
+      Sphere(
+        center = Vec3(11, -11, 26),
+        radius = 4,
+        material = MCDiffuse(LIGHT_SKY_BLUE)
+      )
+    )
+  )
+
+  val glowingSphere = new MonteCarloScene(
     imageWidth = 600,
     imageHeight = 600,
 
     samplesPerPixel = 120,
     maxBounces = 5,
 
+    background = _ => WHITE,
+
     shapes = List(
-      Box(lenX = 30, lenY = 30, lenZ = 40,
-        transformation = new Transformation(0, 0, 19),
-        material = MCDiffuse(LIGHT_GRAY)
+      Plane(
+        point = Vec3(0, -5, 0),
+        normal = UNIT_Y,
+        material = MCDiffuse(SEAGREEN)
       ),
-      Box(lenX = 30, lenY = 30, lenZ = 40,
-        transformation = new Transformation(0, 29, 19),
-        material = MCLight(WHITE, 2)
+      Plane(
+        point = Vec3(0, 0, 50),
+        normal = Vec3(1, 0, -1).normalize,
+        material = MCDiffuse(DEEP_SKY_BLUE)
       ),
-      Box(lenX = 10, lenY = 20, lenZ = 10,
-        transformation = new Transformation(0, -20, 0, 7, -5, 35),
-        material = MCDiffuse(RED)
+      Plane(
+        point = Vec3(0, 0, 50),
+        normal = Vec3(-1, 0, -1).normalize,
+        material = MCDiffuse(ORANGE)
       ),
-      Box(lenX = 10, lenY = 20, lenZ = 10,
-        transformation = new Transformation(0, 20, 0, -5, -5, 30),
-        material = MCDiffuse(LAWN_GREEN)
-      )
+      Sphere(
+        center = Vec3(-8, 2, 30),
+        radius = 7,
+        material = AreaLight(LAWN_GREEN, intensity = 2)
+      ),
+      Sphere(
+        center = Vec3(8, 2, 30),
+        radius = 7,
+        material = MCDiffuse(LIGHT_SKY_BLUE)
+      ),
     )
   )
 }

@@ -1,7 +1,7 @@
 package Graphics3D.Shapes
 
-import Graphics3D.Components._
 import Graphics3D.Geometry._
+import Graphics3D.Components._
 
 case class Sphere[M](center: Vec3, radius: Double,
                   override val material: M = null) extends RMShape[M] with RTShape[M] {

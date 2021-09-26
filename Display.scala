@@ -2,8 +2,9 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
-
 import scala.annotation.tailrec
+
+import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 
 import Graphics3D.Geometry.Vec3
 import Graphics3D.Components._
@@ -16,16 +17,18 @@ class Display(val image: BufferedImage) extends JPanel {
 
 object Main {
   def renderImage(renderable: Renderable): BufferedImage = {
+    val pixels = for {
+      x <- 0 until renderable.imageWidth
+      y <- 0 until renderable.imageHeight
+    } yield (x, y)
+
     val image: BufferedImage = new BufferedImage(
       renderable.imageWidth,
       renderable.imageHeight,
       BufferedImage.TYPE_INT_RGB
     )
-    for (x <- 0 until renderable.imageWidth) {
-      for (y <- 0 until renderable.imageHeight) {
-        val color = renderable.getPixelColor(x, y)
-        image.setRGB(x, y, color.toHex)
-      }
+    pixels.par.foreach {
+      case (x, y) => image.setRGB(x, y, renderable.getPixelColor(x, y).toInt)
     }
     image
   }
@@ -57,7 +60,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    val image: BufferedImage = renderImage(Scenes.MCcornellBox)
+    val image: BufferedImage = renderImage(Scenes.cornellBox)
     val frame = new JFrame
     frame.setTitle("3D Graphics")
     frame.setSize(image.getWidth, image.getHeight)

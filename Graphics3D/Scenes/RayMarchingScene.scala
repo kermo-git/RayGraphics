@@ -1,11 +1,11 @@
 package Graphics3D.Scenes
 
-import Graphics3D.Colors.{BLACK, Color}
-import Graphics3D.Components._
-import Graphics3D.Geometry.Vec3
-
 import scala.annotation.tailrec
 import scala.math.{abs, min}
+
+import Graphics3D.Geometry.Vec3
+import Graphics3D.Color, Color.BLACK
+import Graphics3D.Components._
 
 class RayMarchingScene(imageWidth: Int,
                        imageHeight: Int,
