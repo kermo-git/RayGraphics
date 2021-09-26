@@ -2,11 +2,11 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
-import scala.annotation.tailrec
 
-import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
-import Graphics3D.Geometry.Vec3
 import Graphics3D.Components._
 
 class Display(val image: BufferedImage) extends JPanel {
@@ -16,58 +16,46 @@ class Display(val image: BufferedImage) extends JPanel {
 }
 
 object Main {
-  def renderImage(renderable: Renderable): BufferedImage = {
-    val pixels = for {
-      x <- 0 until renderable.imageWidth
-      y <- 0 until renderable.imageHeight
-    } yield (x, y)
-
+  def renderImage(renderable: Renderable): Future[BufferedImage] = {
     val image: BufferedImage = new BufferedImage(
       renderable.imageWidth,
       renderable.imageHeight,
       BufferedImage.TYPE_INT_RGB
     )
-    pixels.par.foreach {
-      case (x, y) => image.setRGB(x, y, renderable.getPixelColor(x, y).toInt)
+    case class Pixel(x: Int, y: Int, color: Int)
+
+    def paintPixel(x: Int, y: Int): Future[Pixel] = Future {
+      Pixel(x, y, renderable.getPixelColor(x, y).toInt)
     }
-    image
-  }
+    val pixels = for {
+      x <- 0 until renderable.imageWidth
+      y <- 0 until renderable.imageHeight
+    } yield paintPixel(x, y)
 
-  def measureNoise(noise: NoiseFunction, units: Int, noiseZ: Double, increment: Double): Unit = {
-    @tailrec
-    def loop(x: Double = 0.0, y: Double = 0.0, min: Double = 10.0, max: Double = -10.0): Unit = {
-      val noiseValue = noise(Vec3(x, y, noiseZ))
-
-      val nextMin = if (noiseValue < min) noiseValue else min
-      val nextMax = if (noiseValue > max) noiseValue else max
-
-      val (nextX, nextY): (Double, Double) =
-        if (x >= units)
-          (0.0, y + increment)
-        else
-          (x + increment, y)
-
-      if (nextY <= units)
-        loop(nextX, nextY, nextMin, nextMax)
-      else {
-        println("Min noise value: " + nextMin)
-        println("Max noise value: " + nextMax)
+    Future.sequence(pixels).flatMap((pixelList: Seq[Pixel]) => {
+      pixelList.foreach {
+        case Pixel(x, y, color) => image.setRGB(x, y, color)
       }
-    }
-    loop()
+      Future(image)
+    })
   }
 
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    val image: BufferedImage = renderImage(Scenes.cornellBox)
-    val frame = new JFrame
-    frame.setTitle("3D Graphics")
-    frame.setSize(image.getWidth, image.getHeight)
-    frame.add(new Display(image))
-    frame.setVisible(true)
+    renderImage(Scenes.cornellBox).onComplete {
+      case Success(image) =>
+        val duration: Double = System.nanoTime - startTime
+        println("Rendering took " + duration / 1e9 + " seconds")
 
-    val duration: Double = System.nanoTime - startTime
-    println("Rendering took " + duration / 1e9 + " seconds")
+        val frame = new JFrame
+        frame.setTitle("3D Graphics")
+        frame.setSize(image.getWidth, image.getHeight)
+        frame.add(new Display(image))
+        frame.setVisible(true)
+
+      case Failure(e) => e.printStackTrace()
+    }
+    Thread.sleep(600000)
   }
 }
