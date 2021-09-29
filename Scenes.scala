@@ -93,27 +93,11 @@ object Scenes {
     )
   )
 
-  val MCfurnaceTest = new MonteCarloScene(
-    imageWidth = 600,
-    imageHeight = 600,
-
-    samplesPerPixel = 100,
-    background = _ => WHITE,
-
-    shapes = List(
-      Sphere(
-        center = Vec3(0, 0, 20),
-        radius = 5,
-        material = MCDiffuse(MEDIUM_BLUE)
-      )
-    )
-  )
-
   val cornellBox = new MonteCarloScene(
     imageWidth = 600,
     imageHeight = 600,
 
-    samplesPerPixel = 1000,
+    samplesPerPixel = 100,
     maxBounces = 5,
 
     shapes = List(
@@ -172,7 +156,7 @@ object Scenes {
     imageWidth = 600,
     imageHeight = 600,
 
-    samplesPerPixel = 1000,
+    samplesPerPixel = 100,
     maxBounces = 5,
 
     shapes = List(
@@ -180,12 +164,12 @@ object Scenes {
       Plane(
         point = Vec3(-15, 0, 0),
         normal = UNIT_X,
-        material = MCDiffuse(RED)
+        material = MCDiffuse(LAWN_GREEN)
       ),
       Plane(
         point = Vec3(15, 0, 0),
         normal = UNIT_X,
-        material = MCDiffuse(LIME)
+        material = MCDiffuse(RED)
       ),
       Plane(
         point = Vec3(0, 0, -1),
@@ -193,7 +177,7 @@ object Scenes {
         material = MCDiffuse(WHITE)
       ),
       Plane(
-        point = Vec3(0, 0, 30),
+        point = Vec3(0, 0, 35),
         normal = UNIT_Z,
         material = MCDiffuse(WHITE)
       ),
@@ -209,66 +193,34 @@ object Scenes {
       ),
 
       // LIGHT SOURCE
-      Box(lenX = 10, lenY = 30, lenZ = 10,
-        transformation = new Transformation(0, 29.5, 25),
-        material = AreaLight(WHITE, intensity = 8)
+      Sphere(
+        center = Vec3(0, 21, 25),
+        radius = 10,
+        material = AreaLight(WHITE, intensity = 3)
       ),
 
       // OBJECTS
 
       Sphere(
-        center = Vec3(-11, -11, 26),
-        radius = 4,
-        material = MCDiffuse(AQUAMARINE)
+        center = Vec3(-9, -3, 30),
+        radius = 6,
+        material = Glossy(
+          diffuse = DEEP_SKY_BLUE,
+          specular = DEEP_SKY_BLUE,
+          reflectivity = 1,
+          roughness = 0.4
+        )
       ),
       Sphere(
-        center = Vec3(0, -11, 26),
-        radius = 4,
-        material = MCDiffuse(GOLD)
-      ),
-      Sphere(
-        center = Vec3(11, -11, 26),
-        radius = 4,
-        material = MCDiffuse(LIGHT_SKY_BLUE)
+        center = Vec3(9, -3, 30),
+        radius = 6,
+        material = Glossy(
+          diffuse = DEEP_SKY_BLUE,
+          specular = DEEP_SKY_BLUE,
+          reflectivity = 0.5,
+          roughness = 0.4
+        )
       )
-    )
-  )
-
-  val glowingSphere = new MonteCarloScene(
-    imageWidth = 600,
-    imageHeight = 600,
-
-    samplesPerPixel = 120,
-    maxBounces = 5,
-
-    background = _ => WHITE,
-
-    shapes = List(
-      Plane(
-        point = Vec3(0, -5, 0),
-        normal = UNIT_Y,
-        material = MCDiffuse(SEAGREEN)
-      ),
-      Plane(
-        point = Vec3(0, 0, 50),
-        normal = Vec3(1, 0, -1).normalize,
-        material = MCDiffuse(DEEP_SKY_BLUE)
-      ),
-      Plane(
-        point = Vec3(0, 0, 50),
-        normal = Vec3(-1, 0, -1).normalize,
-        material = MCDiffuse(ORANGE)
-      ),
-      Sphere(
-        center = Vec3(-8, 2, 30),
-        radius = 7,
-        material = AreaLight(LAWN_GREEN, intensity = 2)
-      ),
-      Sphere(
-        center = Vec3(8, 2, 30),
-        radius = 7,
-        material = MCDiffuse(LIGHT_SKY_BLUE)
-      ),
     )
   )
 }

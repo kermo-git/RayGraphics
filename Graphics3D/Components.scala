@@ -64,7 +64,6 @@ object Components {
                                  FOVDegrees: Int,
 
                                  val maxBounces: Int,
-                                 val rayHitBias: Double,
                                  val renderShadows: Boolean,
 
                                  val lights: List[PointLight]) extends Scene(imageWidth, imageHeight, FOVDegrees) {
@@ -81,8 +80,6 @@ object Components {
   trait Material {
     def shade(scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
   }
-
-  case class RayHit(hitPoint: Vec3, distFromOrigin: Double)
 
   trait Shape[M] {
     val material: M

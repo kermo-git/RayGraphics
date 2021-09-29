@@ -22,7 +22,7 @@ case class Metal(diffuse: Color = SILVER,
     val diffuseColor = phong.shade(scene, incident, hitPoint, normal, depth, inside)
 
     if (depth < scene.maxBounces) {
-      val biasedHitPoint = hitPoint + normal * scene.rayHitBias
+      val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
       val cos = -(incident dot normal)
       val reflectionRatio = reflectivity + (1 - reflectivity) * schlick(1, ior, cos)
       val reflectionColor = scene.castRay(biasedHitPoint, reflection(incident, normal), depth + 1)

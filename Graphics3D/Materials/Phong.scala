@@ -19,7 +19,7 @@ case class Phong(diffuse: Color = LIGHT_GRAY,
                      depth: Int,
                      inside: Boolean): Color = {
 
-    val biasedHitPoint = hitPoint + normal * scene.rayHitBias
+    val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
 
     def addLight(color: Color, light: PointLight): Color = {
       val shadow = if (scene.renderShadows) scene.getShadow(biasedHitPoint, light) else 1

@@ -35,12 +35,12 @@ object SampleTextures {
 
   def BROWN_TREE_BARK(point: Vec3): Color = {
     val noise = perlinNoise(point * Vec3(10, 1, 10))
-    blendColors(new Color(0x916A36), BLACK, noise)
+    lerp(new Color(0x916A36), BLACK, noise)
   }
 
   def GRAY_TREE_BARK(point: Vec3): Color = {
     val noise = perlinNoise(point * Vec3(10, 1, 10))
-    blendColors(new Color(0x80725c), BLACK, noise)
+    lerp(new Color(0x80725c), BLACK, noise)
   }
 
   val DARK_WOOD: TextureFunction =

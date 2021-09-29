@@ -12,7 +12,6 @@ class RayMarchingScene(imageWidth: Int,
                        FOVDegrees: Int = 70,
 
                        maxBounces: Int = 5,
-                       rayHitBias: Double = SURFACE_BIAS,
 
                        renderShadows: Boolean = true,
                        val shadowStepMultiPlier: Double = 1,
@@ -27,7 +26,7 @@ class RayMarchingScene(imageWidth: Int,
                        val shapes: List[RMShape[Material]]
                       )
   extends PointLightScene(
-    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights
+    imageWidth, imageHeight, FOVDegrees, maxBounces, renderShadows, lights
   ) {
 
   type Shape = RMShape[Material]

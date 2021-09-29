@@ -1,7 +1,5 @@
 package Graphics3D
 
-import Graphics3D.Geometry.lerp
-
 class Color(val red: Double, val green: Double, val blue: Double) {
   def this(hex: Int) {
     this(
@@ -25,10 +23,10 @@ class Color(val red: Double, val green: Double, val blue: Double) {
 }
 
 object Color {
-  def blendColors(color1: Color, color2: Color, ratio: Double): Color = new Color(
-    lerp(color1.red, color2.red, ratio),
-    lerp(color1.green, color2.green, ratio),
-    lerp(color1.blue, color2.blue, ratio)
+  def lerp(a: Color, b: Color, ratio: Double): Color = new Color(
+    Geometry.lerp(a.red, b.red, ratio),
+    Geometry.lerp(a.green, b.green, ratio),
+    Geometry.lerp(a.blue, b.blue, ratio)
   )
 
   val MEDIUM_VIOLET_RED: Color = new Color(0xC71585)

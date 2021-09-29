@@ -136,10 +136,10 @@ object Geometry {
 
   def lerp(a: Double, b: Double, t: Double): Double = a + t * (b - a)
 
-  def mix(vec1: Vec3, vec2: Vec3, weight: Double): Color = new Color(
-    lerp(vec1.x, vec2.x, weight),
-    lerp(vec1.y, vec2.y, weight),
-    lerp(vec1.z, vec2.z, weight)
+  def lerp(a: Vec3, b: Vec3, t: Double): Vec3 = Vec3(
+    lerp(a.x, b.x, t),
+    lerp(a.y, b.y, t),
+    lerp(a.z, b.z, t)
   )
 
   def solveQuadraticEquation(a: Double, b: Double, c: Double): Option[(Double, Double)] = {

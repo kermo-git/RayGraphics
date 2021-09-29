@@ -3,8 +3,8 @@ import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 import Graphics3D.Components._
@@ -43,7 +43,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    renderImage(Scenes.cornellBox).onComplete {
+    renderImage(Scenes.rayTracingTest).onComplete {
       case Success(image) =>
         val duration: Double = System.nanoTime - startTime
         println("Rendering took " + duration / 1e9 + " seconds")

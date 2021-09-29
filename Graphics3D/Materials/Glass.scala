@@ -17,7 +17,7 @@ case class Glass(color: Color = WHITE,
 
     if (depth > scene.maxBounces) BLACK
     else {
-      val hitPointOffset = normal * scene.rayHitBias
+      val hitPointOffset = normal * SURFACE_BIAS
       val reflectionColor = scene.castRay(hitPoint + hitPointOffset, reflection(incident, normal), depth + 1, inside)
 
       val (n1, n2) = if (inside) (ior, 1.0) else (1.0, ior)

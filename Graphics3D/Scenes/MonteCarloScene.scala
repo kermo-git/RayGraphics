@@ -2,9 +2,11 @@ package Graphics3D.Scenes
 
 import scala.annotation.tailrec
 
-import Graphics3D.Geometry.{Vec3, randUnitVector}
-import Graphics3D.Color, Color.BLACK
+import Graphics3D.Geometry._
+import Graphics3D.Color, Color.BLACK, Color.WHITE
 import Graphics3D.Components._
+
+import scala.util.Random
 
 class MonteCarloScene(imageWidth: Int,
                       imageHeight: Int,
@@ -12,7 +14,6 @@ class MonteCarloScene(imageWidth: Int,
 
                       val samplesPerPixel: Int = 10,
                       val maxBounces: Int = 2,
-                      val rayHitBias: Double = SURFACE_BIAS,
 
                       val background: TextureFunction = _ => BLACK,
                       val backGroundScale: Double = 1,
@@ -49,17 +50,6 @@ trait MonteCarloMaterial {
   def shade(scene: MonteCarloScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
 }
 
-case class MCDiffuse(color: Color) extends MonteCarloMaterial {
-  override def shade(scene: MonteCarloScene,
-                     incident: Vec3, hitPoint: Vec3,
-                     normal: Vec3, recDepth: Int,
-                     inside: Boolean): Color = {
-
-    val nextDirection = (normal + randUnitVector).normalize
-    color * scene.castRay(hitPoint + normal * scene.rayHitBias, nextDirection, recDepth + 1)
-  }
-}
-
 case class AreaLight(color: Color, intensity: Double) extends MonteCarloMaterial {
   private val energy = color * intensity
 
@@ -67,4 +57,42 @@ case class AreaLight(color: Color, intensity: Double) extends MonteCarloMaterial
                      incident: Vec3, hitPoint: Vec3,
                      normal: Vec3, recDepth: Int,
                      inside: Boolean): Color = energy
+}
+
+case class MCDiffuse(color: Color) extends MonteCarloMaterial {
+  override def shade(scene: MonteCarloScene,
+                     incident: Vec3, hitPoint: Vec3,
+                     normal: Vec3, recDepth: Int,
+                     inside: Boolean): Color = {
+
+    val nextDirection = (normal + randUnitVector).normalize
+    color * scene.castRay(hitPoint + normal * SURFACE_BIAS, nextDirection, recDepth + 1)
+  }
+}
+
+case class Glossy(diffuse: Color,
+                  specular: Color = WHITE,
+                  reflectivity: Double = 0,
+                  ior: Double = 1.3,
+                  roughness: Double = 0) extends MonteCarloMaterial {
+
+  override def shade(scene: MonteCarloScene,
+                     incident: Vec3, hitPoint: Vec3,
+                     normal: Vec3, recDepth: Int,
+                     inside: Boolean): Color = {
+
+    val reflectionChance = lerp(reflectivity, 1, schlick(1, ior, -(incident dot normal)))
+    val doReflection = Random.nextDouble() < reflectionChance
+
+    val diffuseDirection = (normal + randUnitVector).normalize
+    val nextDirection: Vec3 =
+      if (doReflection)
+        lerp(reflection(incident, normal), diffuseDirection, roughness).normalize
+      else
+        diffuseDirection
+
+    val albedo = if (doReflection) specular else diffuse
+
+    albedo * scene.castRay(hitPoint + normal * SURFACE_BIAS, nextDirection, recDepth + 1)
+  }
 }

@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.math.{abs, min}
 
 import Graphics3D.Geometry.Vec3
-import Graphics3D.Color, Color.blendColors
+import Graphics3D.Color, Color.lerp
 import Graphics3D.Components.NoiseFunction
 import NoiseGenerator._
 
@@ -38,12 +38,12 @@ object TextureUtils {
     val colorIndex: Int = noiseValue.toInt
     val ratio = noiseValue - colorIndex
 
-    blendColors(colors(colorIndex), colors(colorIndex + 1), ratio)
+    lerp(colors(colorIndex), colors(colorIndex + 1), ratio)
   }
 
   def wood(noise: NoiseFunction, density: Int, stretchY: Double, darkColor: Color, lightColor: Color)(point: Vec3): Color = {
     val woodValue = noise(point * Vec3(1, stretchY, 1)) * density
     val bumpsValue = perlinNoise(point * Vec3(50, 10, 50))
-    blendColors(darkColor, lightColor, min(1, woodValue - woodValue.toInt + bumpsValue))
+    lerp(darkColor, lightColor, min(1, woodValue - woodValue.toInt + bumpsValue))
   }
 }

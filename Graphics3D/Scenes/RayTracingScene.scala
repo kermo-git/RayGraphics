@@ -11,7 +11,6 @@ class RayTracingScene(imageWidth: Int,
                       FOVDegrees: Int = 70,
 
                       maxBounces: Int = 5,
-                      rayHitBias: Double = SURFACE_BIAS,
                       renderShadows: Boolean = true,
 
                       val background: TextureFunction = _ => BLACK,
@@ -21,7 +20,7 @@ class RayTracingScene(imageWidth: Int,
                       val shapes: List[RTShape[Material]]
                      )
   extends PointLightScene(
-    imageWidth, imageHeight, FOVDegrees, maxBounces, rayHitBias, renderShadows, lights
+    imageWidth, imageHeight, FOVDegrees, maxBounces, renderShadows, lights
   ) {
 
   type Shape = RTShape[Material]
