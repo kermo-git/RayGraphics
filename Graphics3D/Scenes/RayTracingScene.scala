@@ -1,32 +1,25 @@
 package Graphics3D.Scenes
 
-import scala.annotation.tailrec
-
 import Graphics3D.Geometry.Vec3
 import Graphics3D.Color, Color.BLACK
 import Graphics3D.Components._
+import Graphics3D.RayObjectFunctions, RayObjectFunctions.traceRay
 
-class RayTracingScene(imageWidth: Int,
-                      imageHeight: Int,
-                      FOVDegrees: Int = 70,
-
+class RayTracingScene(camera: Camera,
                       maxBounces: Int = 5,
-                      renderShadows: Boolean = true,
+                      pointLights: List[PointLight] = Nil,
 
+                      val shapes: List[RTShape],
                       val background: TextureFunction = _ => BLACK,
-                      val backGroundScale: Double = 1,
-
-                      lights: List[PointLight],
-                      val shapes: List[RTShape[Material]]
+                      val backGroundScale: Double = 1
                      )
-  extends PointLightScene(
-    imageWidth, imageHeight, FOVDegrees, maxBounces, renderShadows, lights
+  extends Scene(
+    camera, maxBounces, pointLights
   ) {
 
-  type Shape = RTShape[Material]
-
-  override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
-    trace(shapes, origin, direction) match {
+  override def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color = {
+    if (depth > maxBounces) BLACK
+    else traceRay(shapes, origin, direction) match {
       case None => background(direction * backGroundScale)
       case Some((shape, distance)) =>
         val hitPoint = origin + direction * distance
@@ -36,19 +29,5 @@ class RayTracingScene(imageWidth: Int,
     }
   }
 
-  override def getShadow(point: Vec3, light: PointLight): Double = {
-    val pointToLight = new Vec3(light.location, point)
-    val distToLight = pointToLight.length
-    val shadowRayDirection = pointToLight.normalize
-
-    @tailrec
-    def shadowTest(_shapes: List[Shape]): Double = _shapes match {
-      case Nil => 1
-      case shape :: tail => shape.getRayHitDist(light.location, shadowRayDirection) match {
-        case None => shadowTest(tail)
-        case Some(distance) => if (distance < distToLight) 0 else shadowTest(tail)
-      }
-    }
-    shadowTest(shapes)
-  }
+  override def visibility(point: Vec3, light: PointLight): Double = RayObjectFunctions.visibility(shapes, point, light)
 }

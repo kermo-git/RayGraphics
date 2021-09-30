@@ -10,7 +10,7 @@ case class Diffuse(color: Color = LIGHT_GRAY) extends Material {
 
   val normColor: Color = color * (1 / Pi)
 
-  override def shade(scene: PointLightScene,
+  override def shade(scene: Scene,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,
@@ -20,9 +20,9 @@ case class Diffuse(color: Color = LIGHT_GRAY) extends Material {
     val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
 
     def addLight(color: Color, light: PointLight): Color = {
-      val shadow = if (scene.renderShadows) scene.getShadow(biasedHitPoint, light) else 1
+      val visibility = scene.visibility(biasedHitPoint, light)
 
-      if (shadow > 0) {
+      if (visibility > 0) {
         val lightVec = new Vec3(hitPoint, light.location)
         val normLightVec = lightVec.normalize
         val diffuseIntensity = normLightVec dot normal
@@ -30,10 +30,10 @@ case class Diffuse(color: Color = LIGHT_GRAY) extends Material {
         if (diffuseIntensity > 0) {
           val lightDist = lightVec.length
           val falloff = 1 / (4 * Pi * lightDist * lightDist)
-          color + normColor * light.energy * falloff * diffuseIntensity * shadow
+          color + normColor * light.energy * falloff * diffuseIntensity * visibility
         } else color
       } else color
     }
-    scene.lights.foldLeft(BLACK)(addLight)
+    scene.pointLights.foldLeft(BLACK)(addLight)
   }
 }

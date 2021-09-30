@@ -4,9 +4,10 @@ import scala.math.{abs, sqrt}
 
 import Graphics3D.Geometry._
 import Graphics3D.Components._
+import Graphics3D.Materials.DummyMaterial
 
-case class Cylinder[M](height: Double, radius: Double, transformation: Transformation,
-                    override val material: M = null) extends RTShape[M] with RMShape[M] {
+case class Cylinder(height: Double, radius: Double, transformation: Transformation,
+                    override val material: Material = DummyMaterial()) extends RTShape with RMShape {
 
   private val (rSqr, minY, maxY) = (radius * radius, -0.5 * height, 0.5 * height)
 

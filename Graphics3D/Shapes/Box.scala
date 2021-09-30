@@ -1,12 +1,22 @@
 package Graphics3D.Shapes
 
-import scala.math.{abs, max, sqrt}
+import scala.math.{abs, sqrt, min, max}
 
 import Graphics3D.Geometry._
 import Graphics3D.Components._
+import Graphics3D.Materials.DummyMaterial
 
-case class Box[M](lenX: Double, lenY: Double, lenZ: Double, transformation: Transformation,
-                  override val material: M = null) extends RTShape[M] with RMShape[M] {
+case class Box(lenX: Double, lenY: Double, lenZ: Double, transformation: Transformation,
+               override val material: Material = DummyMaterial()) extends RTShape with RMShape {
+
+  private val (maxX, maxY, maxZ, minX, minY, minZ) = (
+     0.5 * lenX,
+     0.5 * lenY,
+     0.5 * lenZ,
+    -0.5 * lenX,
+    -0.5 * lenY,
+    -0.5 * lenZ
+  )
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse
@@ -40,70 +50,41 @@ case class Box[M](lenX: Double, lenY: Double, lenZ: Double, transformation: Tran
       worldOrigin * transformation.fullInverse,
       worldDirection * transformation.rotationInverse
     )
-    def testNextSide(prevHit: Option[Double], nextTest: HitTest): Option[Double] = {
-      val distance = nextTest.getHitDist(origin, direction)
 
-      if (distance < 0)
-        prevHit
-      else prevHit match {
-        case None => nextTest.getHit(origin, direction, distance)
-        case Some(prevDist) =>
-          if (distance < prevDist)
-            nextTest.getHit(origin, direction, distance) match {
-              case None => prevHit
-              case x => x
-            }
+    val x1 = (minX - origin.x) / direction.x
+    val x2 = (maxX - origin.x) / direction.x
+
+    val (t_minX, t_maxX): (Double, Double) = if (x1 < x2) (x1, x2) else (x2, x1)
+
+    val y1 = (minY - origin.y) / direction.y
+    val y2 = (maxY - origin.y) / direction.y
+
+    val (t_minY, t_maxY): (Double, Double) = if (y1 < y2) (y1, y2) else (y2, y1)
+
+    if (t_maxX < t_minY || t_maxY < t_minX)
+      None
+    else {
+      val z1 = (minZ - origin.z) / direction.z
+      val z2 = (maxZ - origin.z) / direction.z
+
+      val (t_minZ, t_maxZ): (Double, Double) = if (z1 < z2) (z1, z2) else (z2, z1)
+
+      if (t_maxX < t_minZ || t_maxZ < t_minX || t_maxY < t_minZ || t_maxZ < t_minY)
+        None
+      else {
+        val outsideDist = max(t_minZ, max(t_minX, t_minY))
+
+        if (outsideDist >= 0)
+          Some(outsideDist)
+        else {
+          val insideDist = min(t_maxZ, min(t_maxX, t_maxY))
+
+          if (insideDist >= 0)
+            Some(insideDist)
           else
-            prevHit
+            None
+        }
       }
     }
-    tests.foldLeft[Option[Double]](None)(testNextSide)
-  }
-
-  private val (maxX, maxY, maxZ, minX, minY, minZ) = (
-     0.5 * lenX,
-     0.5 * lenY,
-     0.5 * lenZ,
-    -0.5 * lenX,
-    -0.5 * lenY,
-    -0.5 * lenZ
-  )
-
-  private val tests: List[HitTest] = List(
-    HitTestX(minX), HitTestX(maxX),
-    HitTestY(minY), HitTestY(maxY),
-    HitTestZ(minZ), HitTestZ(maxZ)
-  )
-
-  private abstract class HitTest {
-    def getHitDist(origin: Vec3, direction: Vec3): Double
-    def inBounds(hitPoint: Vec3): Boolean
-    def getHit(origin: Vec3, direction: Vec3, distance: Double): Option[Double] = {
-      if (inBounds(origin + direction * distance))
-        Some(distance)
-      else
-        None
-    }
-  }
-
-  private case class HitTestX(xPlanePos: Double) extends HitTest {
-    def getHitDist(origin: Vec3, direction: Vec3): Double = (xPlanePos - origin.x) / direction.x
-    def inBounds(hitPoint: Vec3): Boolean =
-      hitPoint.y >= minY && hitPoint.y <= maxY &&
-      hitPoint.z >= minZ && hitPoint.z <= maxZ
-  }
-
-  private case class HitTestY(yPlanePos: Double) extends HitTest {
-    def getHitDist(origin: Vec3, direction: Vec3): Double = (yPlanePos - origin.y) / direction.y
-    def inBounds(hitPoint: Vec3): Boolean =
-      hitPoint.x >= minX && hitPoint.x <= maxX &&
-      hitPoint.z >= minZ && hitPoint.z <= maxZ
-  }
-
-  private case class HitTestZ(zPlanePos: Double) extends HitTest {
-    def getHitDist(origin: Vec3, direction: Vec3): Double = (zPlanePos - origin.z) / direction.z
-    def inBounds(hitPoint: Vec3): Boolean =
-      hitPoint.x >= minX && hitPoint.x <= maxX &&
-      hitPoint.y >= minY && hitPoint.y <= maxY
   }
 }

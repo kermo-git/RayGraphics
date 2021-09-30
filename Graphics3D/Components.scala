@@ -1,8 +1,10 @@
 package Graphics3D
 
 import scala.math.{tan, toRadians}
+import Geometry._
+import Color._
 
-import Geometry._, Color._
+import scala.annotation.tailrec
 
 object Components {
   trait Renderable {
@@ -41,11 +43,9 @@ object Components {
     }
   }
 
-  abstract class Scene(val imageWidth: Int,
-                       val imageHeight: Int,
-                       val FOVDegrees: Int) extends Renderable {
-
-    def getPixelColor(x: Int, y: Int): Color = castRay(ORIGIN, getCameraRay(x, y))
+  case class Camera(imageWidth: Int,
+                    imageHeight: Int,
+                    FOVDegrees: Int) {
 
     private val imagePlaneWidth = 2 * tan(toRadians(FOVDegrees / 2))
     private val imagePlaneHeight = imagePlaneWidth * imageHeight / imageWidth
@@ -55,20 +55,36 @@ object Components {
       val _y = (imagePlaneHeight - imagePlaneHeight * y / imageHeight) - 0.5 * imagePlaneHeight
       Vec3(_x, _y, 1).normalize
     }
-
-    def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color
   }
 
-  abstract class PointLightScene(imageWidth: Int,
-                                 imageHeight: Int,
-                                 FOVDegrees: Int,
+  abstract class Scene(val camera: Camera,
+                       val maxBounces: Int,
+                       val pointLights: List[PointLight]) extends Renderable {
 
-                                 val maxBounces: Int,
-                                 val renderShadows: Boolean,
+    val imageWidth: Int = camera.imageWidth
+    val imageHeight: Int = camera.imageHeight
 
-                                 val lights: List[PointLight]) extends Scene(imageWidth, imageHeight, FOVDegrees) {
+    override def getPixelColor(x: Int, y: Int): Color = castRay(ORIGIN, camera.getCameraRay(x, y))
 
-    def getShadow(point: Vec3, light: PointLight): Double
+    def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color
+    def visibility(point: Vec3, light: PointLight): Double
+  }
+
+  trait MonteCarloScene extends Scene {
+    val samplesPerPixel: Int
+    private lazy val avgMultiplier = 1.0 / samplesPerPixel
+
+    override def getPixelColor(x: Int, y: Int): Color = {
+      @tailrec
+      def addSample(color: Color, i: Int): Color = {
+        if (i >= samplesPerPixel)
+          color
+        else {
+          addSample(color + castRay(ORIGIN, camera.getCameraRay(x, y)), i + 1)
+        }
+      }
+      addSample(BLACK, 0) * avgMultiplier
+    }
   }
 
   case class PointLight(location: Vec3, color: Color = WHITE,
@@ -78,36 +94,16 @@ object Components {
   }
 
   trait Material {
-    def shade(scene: PointLightScene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
+    def shade(scene: Scene, incident: Vec3, hitPoint: Vec3, normal: Vec3, recDepth: Int, inside: Boolean): Color
   }
 
-  trait Shape[M] {
-    val material: M
+  trait Shape {
+    val material: Material
     def getNormal(point: Vec3): Vec3
   }
 
-  trait RTShape[M] extends Shape[M] {
+  trait RTShape extends Shape {
     def getRayHitDist(origin: Vec3, direction: Vec3): Option[Double]
-  }
-
-  type RTShapeHit[M] = Option[(RTShape[M], Double)]
-
-  def trace[M](shapes: List[RTShape[M]], origin: Vec3, direction: Vec3): RTShapeHit[M] = {
-    shapes.foldLeft[RTShapeHit[M]](None)((prevResult, nextShape) => {
-      nextShape.getRayHitDist(origin, direction) match {
-        case None => prevResult
-        case Some(nextDist) =>
-          val nextResult = Some((nextShape, nextDist))
-          prevResult match {
-            case None => nextResult
-            case Some((_, prevDist)) =>
-              if (prevDist < nextDist)
-                prevResult
-              else
-                nextResult
-          }
-      }
-    })
   }
 
   val SURFACE_BIAS = 0.005
@@ -118,7 +114,7 @@ object Components {
     Vec3(0, 0, 0.001)
   )
 
-  trait RMShape[M] extends Shape[M] {
+  trait RMShape extends Shape {
     def getDistance(point: Vec3): Double
 
     override def getNormal(point: Vec3): Vec3 = {

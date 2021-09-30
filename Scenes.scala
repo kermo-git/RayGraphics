@@ -25,11 +25,12 @@ object Scenes {
     texture = FIRE
   )
 
-  val rayTracingTest = new RayTracingScene(
-    imageWidth = 600,
-    imageHeight = 600,
+  val camera: Camera = Camera(600, 600, 70)
 
-    lights = List(
+  val rayTracingTest = new RayTracingScene(
+    camera = camera,
+
+    pointLights = List(
       PointLight(location = Vec3(-14, 14, 0), intensity = 40000)
     ),
 
@@ -55,13 +56,12 @@ object Scenes {
   )
 
   val rayMarchingTest = new RayMarchingScene(
-    imageWidth = 600,
-    imageHeight = 600,
+    camera = camera,
 
     background = EXPLOSION,
     backGroundScale = 4,
 
-    lights = List(
+    pointLights = List(
       PointLight(location = Vec3(0, 20, 30), intensity = 20000)
     ),
 
@@ -93,11 +93,9 @@ object Scenes {
     )
   )
 
-  val cornellBox = new MonteCarloScene(
-    imageWidth = 600,
-    imageHeight = 600,
+  val cornellBox: Scene = new RayTracingScene(
+    camera = camera,
 
-    samplesPerPixel = 100,
     maxBounces = 5,
 
     shapes = List(
@@ -150,13 +148,10 @@ object Scenes {
         material = MCDiffuse(WHITE)
       )
     )
-  )
+  ) with MonteCarloScene { val samplesPerPixel = 100 }
 
-  val cornellBoxBalls = new MonteCarloScene(
-    imageWidth = 600,
-    imageHeight = 600,
-
-    samplesPerPixel = 100,
+  val cornellBoxBalls: Scene = new RayTracingScene(
+    camera = camera,
     maxBounces = 5,
 
     shapes = List(
@@ -164,12 +159,12 @@ object Scenes {
       Plane(
         point = Vec3(-15, 0, 0),
         normal = UNIT_X,
-        material = MCDiffuse(LAWN_GREEN)
+        material = MCTexture(LAVA_ROCK, 0.2) // MCDiffuse(LAWN_GREEN)
       ),
       Plane(
         point = Vec3(15, 0, 0),
         normal = UNIT_X,
-        material = MCDiffuse(RED)
+        material = MCDiffuse(LAWN_GREEN)
       ),
       Plane(
         point = Vec3(0, 0, -1),
@@ -179,7 +174,7 @@ object Scenes {
       Plane(
         point = Vec3(0, 0, 35),
         normal = UNIT_Z,
-        material = MCDiffuse(WHITE)
+        material = MCTexture(CLOUDS, 0.1) // MCDiffuse(WHITE)
       ),
       Plane(
         point = Vec3(0, 15, 0),
@@ -202,25 +197,25 @@ object Scenes {
       // OBJECTS
 
       Sphere(
-        center = Vec3(-9, -3, 30),
+        center = Vec3(-6, -3, 30),
         radius = 6,
         material = Glossy(
-          diffuse = DEEP_SKY_BLUE,
-          specular = DEEP_SKY_BLUE,
+          diffuse = WHITE,
+          specular = WHITE,
           reflectivity = 1,
-          roughness = 0.4
+          roughness = 0.3
         )
       ),
       Sphere(
-        center = Vec3(9, -3, 30),
+        center = Vec3(6, -3, 25), // Vec3(9, -3, 30),
         radius = 6,
-        material = Glossy(
+        material = MCTexture(LIGHT_BLUE_SPOTS, 0.4) /* Glossy(
           diffuse = DEEP_SKY_BLUE,
           specular = DEEP_SKY_BLUE,
           reflectivity = 0.5,
           roughness = 0.4
-        )
+        ) */
       )
     )
-  )
+  ) with MonteCarloScene { val samplesPerPixel = 1000 }
 }

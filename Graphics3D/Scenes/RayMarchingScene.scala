@@ -1,57 +1,25 @@
 package Graphics3D.Scenes
 
-import scala.annotation.tailrec
-import scala.math.{abs, min}
-
 import Graphics3D.Geometry.Vec3
 import Graphics3D.Color, Color.BLACK
 import Graphics3D.Components._
+import Graphics3D.RayObjectFunctions.{marchRay, softShadowVisibility}
 
-class RayMarchingScene(imageWidth: Int,
-                       imageHeight: Int,
-                       FOVDegrees: Int = 70,
-
+class RayMarchingScene(camera: Camera,
                        maxBounces: Int = 5,
+                       pointLights: List[PointLight] = Nil,
 
-                       renderShadows: Boolean = true,
-                       val shadowStepMultiPlier: Double = 1,
-
-                       val maxDist: Double = 100,
-                       val rayHitThreshold: Double = 0.001,
-
+                       val shapes: List[RMShape],
                        val background: TextureFunction = _ => BLACK,
-                       val backGroundScale: Double = 1,
-
-                       lights: List[PointLight],
-                       val shapes: List[RMShape[Material]]
+                       val backGroundScale: Double = 1
                       )
-  extends PointLightScene(
-    imageWidth, imageHeight, FOVDegrees, maxBounces, renderShadows, lights
+  extends Scene(
+    camera, maxBounces, pointLights
   ) {
 
-  type Shape = RMShape[Material]
-  type ShapeDist = Option[(Shape, Double)]
-  type ShapeHit = Option[(Shape, Vec3)]
-
-  override def castRay(origin: Vec3, direction: Vec3, depth: Int, inside: Boolean): Color = {
-
-    @tailrec
-    def findHitPoint(traveledDist: Double = 0): ShapeHit = {
-      if (traveledDist > maxDist) None
-      else {
-        val currentPos = origin + direction * traveledDist
-        findClosestObject(currentPos) match {
-          case Some((shape, distance)) =>
-            if (distance < rayHitThreshold)
-              Some((shape, currentPos))
-            else
-              findHitPoint(traveledDist + distance)
-          case None => None
-        }
-      }
-    }
-
-    findHitPoint() match {
+  override def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color = {
+    if (depth > maxBounces) BLACK
+    else marchRay(shapes, origin, direction, 100) match {
       case None => background(direction * backGroundScale)
       case Some((shape, hitPoint)) =>
         val normal = shape.getNormal(hitPoint)
@@ -60,46 +28,6 @@ class RayMarchingScene(imageWidth: Int,
     }
   }
 
-  override def getShadow(point: Vec3, light: PointLight): Double = {
-    val pointToLight = new Vec3(point, light.location)
-    val distToLight = pointToLight.length
-    val direction = pointToLight.normalize
-
-    @tailrec
-    def doShadowRayMarching(traveledDist: Double = 0, shadowValue: Double = 1): Double = {
-      if (traveledDist > distToLight) shadowValue
-      else {
-        findClosestObject(point + direction * traveledDist) match {
-          case Some((_, sceneDist)) =>
-            if (sceneDist < rayHitThreshold) 0
-            else
-              doShadowRayMarching(
-                traveledDist = traveledDist + shadowStepMultiPlier * sceneDist,
-                shadowValue = min(shadowValue, light.shadowSharpness * sceneDist / traveledDist)
-              )
-          case None => shadowValue
-        }
-      }
-    }
-    doShadowRayMarching()
-  }
-
-  @tailrec
-  private def findClosestObject(viewPoint: Vec3, _shapes: List[Shape] = shapes, prevClosest: ShapeDist = None): ShapeDist = _shapes match {
-    case shape :: tail =>
-      val nextDist = abs(shape.getDistance(viewPoint))
-      val nextResult = Some((shape, nextDist))
-
-      if (nextDist < rayHitThreshold)
-        nextResult
-      else {
-        val nextClosest = prevClosest match {
-          case Some((_, prevDist)) =>
-            if (nextDist < prevDist) nextResult else prevClosest
-          case None => nextResult
-        }
-        findClosestObject(viewPoint, tail, nextClosest)
-      }
-    case Nil => prevClosest
-  }
+  override def visibility(point: Vec3, light: PointLight): Double =
+    softShadowVisibility(shapes, point, light, 0.5)
 }

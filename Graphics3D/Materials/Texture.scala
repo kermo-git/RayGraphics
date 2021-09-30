@@ -8,7 +8,7 @@ case class Texture(textureFunction: TextureFunction,
                    textureScale: Double,
                    shininess: Double = 128) extends Material {
 
-  override def shade(scene: PointLightScene,
+  override def shade(scene: Scene,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,

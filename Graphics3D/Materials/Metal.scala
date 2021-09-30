@@ -12,7 +12,7 @@ case class Metal(diffuse: Color = SILVER,
 
   val phong: Phong = Phong(diffuse, specular, shininess)
 
-  override def shade(scene: PointLightScene,
+  override def shade(scene: Scene,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,
@@ -21,14 +21,11 @@ case class Metal(diffuse: Color = SILVER,
 
     val diffuseColor = phong.shade(scene, incident, hitPoint, normal, depth, inside)
 
-    if (depth < scene.maxBounces) {
-      val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
-      val cos = -(incident dot normal)
-      val reflectionRatio = reflectivity + (1 - reflectivity) * schlick(1, ior, cos)
-      val reflectionColor = scene.castRay(biasedHitPoint, reflection(incident, normal), depth + 1)
+    val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
+    val cos = -(incident dot normal)
+    val reflectionRatio = reflectivity + (1 - reflectivity) * schlick(1, ior, cos)
+    val reflectionColor = scene.castRay(biasedHitPoint, reflection(incident, normal), depth + 1)
 
-      diffuseColor * (1 - reflectionRatio) + reflectionColor * reflectionRatio
-    }
-    else diffuseColor
+    diffuseColor * (1 - reflectionRatio) + reflectionColor * reflectionRatio
   }
 }

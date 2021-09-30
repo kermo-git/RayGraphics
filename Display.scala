@@ -17,20 +17,16 @@ class Display(val image: BufferedImage) extends JPanel {
 
 object Main {
   def renderImage(renderable: Renderable): Future[BufferedImage] = {
-    val image: BufferedImage = new BufferedImage(
-      renderable.imageWidth,
-      renderable.imageHeight,
-      BufferedImage.TYPE_INT_RGB
-    )
+    val w = renderable.imageWidth
+    val h = renderable.imageHeight
+
+    val image: BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
     case class Pixel(x: Int, y: Int, color: Int)
 
     def paintPixel(x: Int, y: Int): Future[Pixel] = Future {
       Pixel(x, y, renderable.getPixelColor(x, y).toInt)
     }
-    val pixels = for {
-      x <- 0 until renderable.imageWidth
-      y <- 0 until renderable.imageHeight
-    } yield paintPixel(x, y)
+    val pixels = for (x <- 0 until w; y <- 0 until h) yield paintPixel(x, y)
 
     Future.sequence(pixels).flatMap((pixelList: Seq[Pixel]) => {
       pixelList.foreach {
@@ -43,7 +39,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    renderImage(Scenes.rayTracingTest).onComplete {
+    renderImage(Scenes.cornellBoxBalls).onComplete {
       case Success(image) =>
         val duration: Double = System.nanoTime - startTime
         println("Rendering took " + duration / 1e9 + " seconds")
