@@ -1,10 +1,9 @@
 package Graphics3D
 
 import scala.math.{tan, toRadians}
+
 import Geometry._
 import Color._
-
-import scala.annotation.tailrec
 
 object Components {
   trait Renderable {
@@ -68,23 +67,6 @@ object Components {
 
     def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color
     def visibility(point: Vec3, light: PointLight): Double
-  }
-
-  trait MonteCarloScene extends Scene {
-    val samplesPerPixel: Int
-    private lazy val avgMultiplier = 1.0 / samplesPerPixel
-
-    override def getPixelColor(x: Int, y: Int): Color = {
-      @tailrec
-      def addSample(color: Color, i: Int): Color = {
-        if (i >= samplesPerPixel)
-          color
-        else {
-          addSample(color + castRay(ORIGIN, camera.getCameraRay(x, y)), i + 1)
-        }
-      }
-      addSample(BLACK, 0) * avgMultiplier
-    }
   }
 
   case class PointLight(location: Vec3, color: Color = WHITE,

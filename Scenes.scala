@@ -3,6 +3,7 @@ import Graphics3D._
 import Geometry._
 import Color._
 import Components._
+import MonteCarlo._
 import Textures.SampleTextures._
 import Textures.TextureUtils._
 import Materials._
@@ -152,14 +153,14 @@ object Scenes {
 
   val cornellBoxBalls: Scene = new RayTracingScene(
     camera = camera,
-    maxBounces = 5,
+    maxBounces = 10,
 
     shapes = List(
       // WALLS
       Plane(
         point = Vec3(-15, 0, 0),
         normal = UNIT_X,
-        material = MCTexture(LAVA_ROCK, 0.2) // MCDiffuse(LAWN_GREEN)
+        material = MCDiffuse(RED)
       ),
       Plane(
         point = Vec3(15, 0, 0),
@@ -174,7 +175,7 @@ object Scenes {
       Plane(
         point = Vec3(0, 0, 35),
         normal = UNIT_Z,
-        material = MCTexture(CLOUDS, 0.1) // MCDiffuse(WHITE)
+        material = MCDiffuse(WHITE)
       ),
       Plane(
         point = Vec3(0, 15, 0),
@@ -189,33 +190,28 @@ object Scenes {
 
       // LIGHT SOURCE
       Sphere(
-        center = Vec3(0, 21, 25),
-        radius = 10,
+        center = Vec3(10, 5, 20),
+        radius = 5,
         material = AreaLight(WHITE, intensity = 3)
       ),
 
       // OBJECTS
 
       Sphere(
-        center = Vec3(-6, -3, 30),
-        radius = 6,
-        material = Glossy(
-          diffuse = WHITE,
-          specular = WHITE,
-          reflectivity = 1,
-          roughness = 0.3
-        )
+        center = Vec3(0, 0, 25),
+        radius = 5,
+        material = MCGlass()
       ),
       Sphere(
-        center = Vec3(6, -3, 25), // Vec3(9, -3, 30),
-        radius = 6,
-        material = MCTexture(LIGHT_BLUE_SPOTS, 0.4) /* Glossy(
-          diffuse = DEEP_SKY_BLUE,
-          specular = DEEP_SKY_BLUE,
-          reflectivity = 0.5,
-          roughness = 0.4
-        ) */
+        center = Vec3(3, -5, 35),
+        radius = 4,
+        material = MCDiffuse(DEEP_SKY_BLUE)
+      ),
+      Sphere(
+        center = Vec3(-3, 5, 35),
+        radius = 4,
+        material = MCDiffuse(GOLD)
       )
     )
-  ) with MonteCarloScene { val samplesPerPixel = 1000 }
+  ) with MonteCarloScene { val samplesPerPixel = 10 }
 }
