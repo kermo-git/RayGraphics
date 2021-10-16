@@ -18,7 +18,7 @@ object MonteCarlo {
         if (i >= samplesPerPixel)
           color
         else {
-          addSample(color + castRay(ORIGIN, camera.getCameraRay(x, y)), i + 1)
+          addSample(color + castRay(ORIGIN, camera.getRandomCameraRay(x, y)), i + 1)
         }
       }
 

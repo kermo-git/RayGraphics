@@ -50,9 +50,19 @@ object Components {
     private val imagePlaneHeight = imagePlaneWidth * imageHeight / imageWidth
 
     def getCameraRay(x: Int, y: Int): Vec3 = {
-      val _x = (imagePlaneWidth * x / imageWidth) - 0.5 * imagePlaneWidth
-      val _y = (imagePlaneHeight - imagePlaneHeight * y / imageHeight) - 0.5 * imagePlaneHeight
-      Vec3(_x, _y, 1).normalize
+      val imagePlaneX = (imagePlaneWidth * x / imageWidth) - 0.5 * imagePlaneWidth
+      val imagePlaneY = (imagePlaneHeight - imagePlaneHeight * y / imageHeight) - 0.5 * imagePlaneHeight
+      Vec3(imagePlaneX, imagePlaneY, 1).normalize
+    }
+
+    def getRandomCameraRay(x: Int, y: Int): Vec3 = {
+      val randomX = x + math.random()
+      val randomY = y + math.random()
+
+      val imagePlaneX = (imagePlaneWidth * randomX / imageWidth) - 0.5 * imagePlaneWidth
+      val imagePlaneY = (imagePlaneHeight - imagePlaneHeight * randomY / imageHeight) - 0.5 * imagePlaneHeight
+
+      Vec3(imagePlaneX, imagePlaneY, 1).normalize
     }
   }
 
