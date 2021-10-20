@@ -2,12 +2,12 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-
 import Graphics3D.Components._
+import Graphics3D.ColorConversions._
+import Graphics3D.LinearColors._
 
 class Display(val image: BufferedImage) extends JPanel {
   override def paint(g: Graphics): Unit = {
@@ -24,7 +24,8 @@ object Main {
     case class Pixel(x: Int, y: Int, color: Int)
 
     def paintPixel(x: Int, y: Int): Future[Pixel] = Future {
-      Pixel(x, y, renderable.getPixelColor(x, y).toInt)
+      val color = renderable.getPixelColor(x, y) apply reinhardToneMap apply tosRGB
+      Pixel(x, y, color.toHex)
     }
     val pixels = for (x <- 0 until w; y <- 0 until h) yield paintPixel(x, y)
 
@@ -39,7 +40,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    renderImage(Scenes.cornellBoxBalls).onComplete {
+    renderImage(Scenes.cornellBox).onComplete {
       case Success(image) =>
         val duration: Double = System.nanoTime - startTime
         println("Rendering took " + duration / 1e9 + " seconds")
@@ -52,6 +53,6 @@ object Main {
 
       case Failure(e) => e.printStackTrace()
     }
-    Thread.sleep(600000)
+    Thread.sleep(700000)
   }
 }

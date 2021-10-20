@@ -4,7 +4,8 @@ import scala.annotation.tailrec
 import scala.math.{abs, min}
 
 import Graphics3D.Geometry.Vec3
-import Graphics3D.Color, Color.lerp
+import Graphics3D.Color
+import Graphics3D.ColorConversions.lerp
 import Graphics3D.Components.NoiseFunction
 import NoiseGenerator._
 

@@ -3,7 +3,7 @@ package Graphics3D
 import scala.math.{tan, toRadians}
 
 import Geometry._
-import Color._
+import LinearColors._
 
 object Components {
   trait Renderable {

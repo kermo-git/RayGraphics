@@ -3,7 +3,8 @@ package Graphics3D.Materials
 import scala.math.pow
 
 import Graphics3D.Geometry._
-import Graphics3D.Color, Color._
+import Graphics3D.Color
+import Graphics3D.LinearColors._
 import Graphics3D.Components._
 
 case class Phong(diffuse: Color = LIGHT_GRAY,

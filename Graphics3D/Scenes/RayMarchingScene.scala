@@ -1,7 +1,8 @@
 package Graphics3D.Scenes
 
 import Graphics3D.Geometry.Vec3
-import Graphics3D.Color, Color.BLACK
+import Graphics3D.Color
+import Graphics3D.LinearColors.BLACK
 import Graphics3D.Components._
 import Graphics3D.RayObjectFunctions.{marchRay, softShadowVisibility}
 

@@ -1,7 +1,9 @@
 package Graphics3D.Textures
 
 import Graphics3D.Geometry.Vec3
-import Graphics3D.Color, Color._
+import Graphics3D.Color
+import Graphics3D.ColorConversions._
+import Graphics3D.LinearColors._
 import Graphics3D.Components.TextureFunction
 import Graphics3D.Textures.TextureUtils._
 
@@ -35,32 +37,32 @@ object SampleTextures {
 
   def BROWN_TREE_BARK(point: Vec3): Color = {
     val noise = perlinNoise(point * Vec3(10, 1, 10))
-    lerp(new Color(0x916A36), BLACK, noise)
+    lerp(createLinearColor(0x916A36), BLACK, noise)
   }
 
   def GRAY_TREE_BARK(point: Vec3): Color = {
     val noise = perlinNoise(point * Vec3(10, 1, 10))
-    lerp(new Color(0x80725c), BLACK, noise)
+    lerp(createLinearColor(0x80725c), BLACK, noise)
   }
 
   val DARK_WOOD: TextureFunction =
     wood(
       noise = absPerlinNoise, density = 10, stretchY = 0.2,
-      darkColor = new Color(0x2E1E00),
-      lightColor = new Color(0x6B4020)
+      darkColor = createLinearColor(0x2E1E00),
+      lightColor = createLinearColor(0x6B4020)
     )(_: Vec3)
 
   val MEDIUM_WOOD: TextureFunction =
     wood(
       noise = absPerlinNoise, density = 10, stretchY = 0.2,
-      darkColor = new Color(0x916A36),
-      lightColor = new Color(0xD49A4E)
+      darkColor = createLinearColor(0x916A36),
+      lightColor = createLinearColor(0xD49A4E)
     )(_: Vec3)
 
   val LIGHT_WOOD: TextureFunction =
     wood(
       noise = absPerlinNoise, density = 10, stretchY = 0.2,
-      darkColor = new Color(0xD6AB72),
-      lightColor = new Color(0xF5D7B3)
+      darkColor = createLinearColor(0xD6AB72),
+      lightColor = createLinearColor(0xF5D7B3)
     )(_: Vec3)
 }

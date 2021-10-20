@@ -3,7 +3,7 @@ package Graphics3D
 import scala.annotation.tailrec
 import scala.util.Random
 
-import Graphics3D.Color.{BLACK, WHITE}
+import Graphics3D.LinearColors.{BLACK, WHITE}
 import Graphics3D.Components._
 import Graphics3D.Geometry._
 
@@ -111,6 +111,23 @@ object MonteCarlo {
             scene.castRay(hitPoint - hitPointOffset, refractionVec, depth + 1, !inside)
       }
       if (inside) result else result * color
+    }
+  }
+
+  case class BDRFMaterial(material: BDRFInterface) extends Material {
+
+    override def shade(scene: Scene,
+                       incident: Vec3, hitPoint: Vec3,
+                       normal: Vec3, depth: Int,
+                       inside: Boolean): Color = {
+
+      val view = incident.invert
+      val nextDirection = material.sample(view, normal)
+
+      val bdrf = material.BRDF(view, normal, nextDirection)
+      val incoming = scene.castRay(hitPoint + normal * SURFACE_BIAS, nextDirection, depth + 1)
+
+      material.emission + bdrf * incoming * (normal dot nextDirection)
     }
   }
 }

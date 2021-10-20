@@ -1,7 +1,8 @@
 package Graphics3D.Materials
 
 import Graphics3D.Geometry._
-import Graphics3D.Color, Color._
+import Graphics3D.Color
+import Graphics3D.LinearColors._
 import Graphics3D.Components._
 
 case class Metal(diffuse: Color = SILVER,

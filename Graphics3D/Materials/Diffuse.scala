@@ -3,7 +3,8 @@ package Graphics3D.Materials
 import scala.math.Pi
 
 import Graphics3D.Geometry._
-import Graphics3D.Color, Color._
+import Graphics3D.Color
+import Graphics3D.LinearColors._
 import Graphics3D.Components._
 
 case class Diffuse(color: Color = LIGHT_GRAY) extends Material {

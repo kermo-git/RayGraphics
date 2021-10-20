@@ -118,6 +118,12 @@ object Geometry {
     def invert: Vec3 = Vec3(-x, -y, -z)
   }
 
+  def fromSpherical(theta: Double, phi: Double): Vec3 = Vec3(
+    cos(phi) * sin(theta),
+    sin(phi) * sin(theta),
+    cos(theta)
+  )
+
   val ORIGIN: Vec3 = Vec3(0, 0, 0)
   val UNIT_X: Vec3 = Vec3(1, 0, 0)
   val UNIT_Y: Vec3 = Vec3(0, 1, 0)
