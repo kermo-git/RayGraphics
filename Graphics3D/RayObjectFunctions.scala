@@ -1,17 +1,17 @@
 package Graphics3D
 
 import scala.annotation.tailrec
-import scala.math.{abs, min}
+import scala.math.abs
 
 import Graphics3D.Geometry.Vec3
 import Graphics3D.Components._
 
 object RayObjectFunctions {
-  type ShapeDist = Option[(Shape, Double)]
-  type ShapeHit = Option[(Shape, Vec3)]
+  type ShapeDist[M] = Option[(Shape[M], Double)]
+  type ShapeHit[M] = Option[(Shape[M], Vec3)]
 
-  def traceRay(shapes: List[RTShape], origin: Vec3, direction: Vec3): ShapeDist =
-    shapes.foldLeft[ShapeDist](None)((prevResult, nextShape) =>
+  def traceRay[M](shapes: List[RTShape[M]], origin: Vec3, direction: Vec3): ShapeDist[M] =
+    shapes.foldLeft[ShapeDist[M]](None)((prevResult, nextShape) =>
       nextShape.getRayHitDist(origin, direction) match {
         case None => prevResult
         case Some(nextDist) =>
@@ -26,32 +26,36 @@ object RayObjectFunctions {
           }
       })
 
-  def visibility(shapes: List[RTShape], point: Vec3, light: PointLight): Double = {
-    val pointToLight = new Vec3(light.location, point)
-    val distToLight = pointToLight.length
-    val shadowRayDirection = pointToLight.normalize
+  def rayTracingVisibility[M](shapes: List[RTShape[M]], point1: Vec3, point2: Vec3): Boolean = {
+    val pointToPoint = new Vec3(point2, point1)
+    val dist = pointToPoint.length
+    val direction = pointToPoint.normalize
 
     @tailrec
-    def shadowTest(_shapes: List[RTShape]): Double = _shapes match {
-      case Nil => 1
-      case shape :: tail => shape.getRayHitDist(light.location, shadowRayDirection) match {
-        case None => shadowTest(tail)
-        case Some(distance) => if (distance < distToLight) 0 else shadowTest(tail)
+    def shadowTest(_shapes: List[RTShape[M]]): Boolean = _shapes match {
+      case Nil => true
+      case shape :: tail => shape.getRayHitDist(point2, direction) match {
+        case None =>
+          shadowTest(tail)
+        case Some(distance) =>
+          if (distance < dist)
+            false
+          else
+            shadowTest(tail)
       }
     }
-
     shadowTest(shapes)
   }
 
   val RAY_HIT_THRESHOLD = 0.001
 
-  def marchRay(shapes: List[RMShape], origin: Vec3, direction: Vec3, maxDist: Double): ShapeHit = {
+  def marchRay[M](shapes: List[RMShape[M]], origin: Vec3, direction: Vec3, maxDist: Double): ShapeHit[M] = {
     @tailrec
-    def march(traveledDist: Double): ShapeHit = {
+    def march(traveledDist: Double): ShapeHit[M] = {
       if (traveledDist > maxDist) None
       else {
         val currentPos = origin + direction * traveledDist
-        findClosestObject(currentPos, shapes, None) match {
+        findClosestObject[M](currentPos, shapes, None) match {
           case Some((shape, distance)) =>
             if (distance < RAY_HIT_THRESHOLD)
               Some((shape, currentPos))
@@ -64,32 +68,29 @@ object RayObjectFunctions {
     march(0)
   }
 
-  def softShadowVisibility(shapes: List[RMShape], point: Vec3, light: PointLight, stepScale: Double = 1): Double = {
-    val pointToLight = new Vec3(point, light.location)
-    val distToLight = pointToLight.length
-    val direction = pointToLight.normalize
+  def rayMarchingVisibility[M](shapes: List[RMShape[M]], point1: Vec3, point2: Vec3): Boolean = {
+    val pointToPoint = new Vec3(point1, point2)
+    val dist = pointToPoint.length
+    val direction = pointToPoint.normalize
 
     @tailrec
-    def doShadowRayMarching(traveledDist: Double = 0, shadowValue: Double = 1): Double = {
-      if (traveledDist > distToLight) shadowValue
+    def doShadowRayMarching(traveledDist: Double): Boolean = {
+      if (traveledDist > dist) true
       else {
-        findClosestObject(point + direction * traveledDist, shapes, None) match {
+        findClosestObject(point1 + direction * traveledDist, shapes, None) match {
           case Some((_, sceneDist)) =>
-            if (sceneDist < RAY_HIT_THRESHOLD) 0
+            if (sceneDist < RAY_HIT_THRESHOLD) false
             else
-              doShadowRayMarching(
-                traveledDist = traveledDist + stepScale * sceneDist,
-                shadowValue = min(shadowValue, light.shadowSharpness * sceneDist / traveledDist)
-              )
-          case None => shadowValue
+              doShadowRayMarching(traveledDist + sceneDist)
+          case None => true
         }
       }
     }
-    doShadowRayMarching()
+    doShadowRayMarching(0)
   }
 
   @tailrec
-  private def findClosestObject(viewPoint: Vec3, shapes: List[RMShape], prevClosest: ShapeDist = None): ShapeDist = {
+  private def findClosestObject[M](viewPoint: Vec3, shapes: List[RMShape[M]], prevClosest: ShapeDist[M] = None): ShapeDist[M] = {
     shapes match {
       case shape :: tail =>
         val nextDist = abs(shape.getDistance(viewPoint))

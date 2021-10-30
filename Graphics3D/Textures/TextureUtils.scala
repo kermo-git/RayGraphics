@@ -5,8 +5,8 @@ import scala.math.{abs, min}
 
 import Graphics3D.Geometry.Vec3
 import Graphics3D.Color
-import Graphics3D.ColorConversions.lerp
-import Graphics3D.Components.NoiseFunction
+import Graphics3D.ColorUtils.lerp
+import Components.NoiseFunction
 import NoiseGenerator._
 
 object TextureUtils {

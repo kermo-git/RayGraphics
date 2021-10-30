@@ -4,10 +4,12 @@ import scala.math.{abs, sqrt, min, max}
 
 import Graphics3D.Geometry._
 import Graphics3D.Components._
-import Graphics3D.Materials.DummyMaterial
 
-case class Box(lenX: Double, lenY: Double, lenZ: Double, transformation: Transformation,
-               override val material: Material = DummyMaterial()) extends RTShape with RMShape {
+case class Box[M](lenX: Double,
+                  lenY: Double,
+                  lenZ: Double,
+                  transformation: Transformation,
+                  material: M) extends RTShape[M] with RMShape[M] {
 
   private val (maxX, maxY, maxZ, minX, minY, minZ) = (
      0.5 * lenX,

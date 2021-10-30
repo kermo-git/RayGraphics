@@ -1,8 +1,9 @@
-package Graphics3D.Materials
+package Graphics3D.Vanilla
 
 import Graphics3D.Geometry._
 import Graphics3D.Color
-import Graphics3D.Components._
+import Graphics3D.Textures.Components.TextureFunction
+import Components.{Material, Scene}
 
 case class Texture(textureFunction: TextureFunction,
                    textureScale: Double,

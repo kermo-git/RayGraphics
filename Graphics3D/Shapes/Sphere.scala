@@ -2,10 +2,10 @@ package Graphics3D.Shapes
 
 import Graphics3D.Geometry._
 import Graphics3D.Components._
-import Graphics3D.Materials.DummyMaterial
 
-case class Sphere(center: Vec3, radius: Double,
-                  override val material: Material = DummyMaterial()) extends RMShape with RTShape {
+case class Sphere[M](center: Vec3,
+                     radius: Double,
+                     material: M) extends RMShape[M] with RTShape[M] {
 
   override def getNormal(point: Vec3): Vec3 = new Vec3(center, point).normalize
   override def getDistance(point: Vec3): Double = new Vec3(center, point).length - radius

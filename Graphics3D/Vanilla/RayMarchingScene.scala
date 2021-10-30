@@ -1,16 +1,18 @@
-package Graphics3D.Scenes
+package Graphics3D.Vanilla
 
 import Graphics3D.Geometry.Vec3
 import Graphics3D.Color
 import Graphics3D.LinearColors.BLACK
 import Graphics3D.Components._
-import Graphics3D.RayObjectFunctions.{marchRay, softShadowVisibility}
+import Graphics3D.RayObjectFunctions.{marchRay, rayMarchingVisibility}
+import Graphics3D.Textures.Components.TextureFunction
+import Components.{Material, Light, Scene}
 
 class RayMarchingScene(camera: Camera,
                        maxBounces: Int = 5,
-                       pointLights: List[PointLight] = Nil,
+                       pointLights: List[Light] = Nil,
 
-                       val shapes: List[RMShape],
+                       val shapes: List[RMShape[Material]],
                        val background: TextureFunction = _ => BLACK,
                        val backGroundScale: Double = 1
                       )
@@ -29,6 +31,6 @@ class RayMarchingScene(camera: Camera,
     }
   }
 
-  override def visibility(point: Vec3, light: PointLight): Double =
-    softShadowVisibility(shapes, point, light, 0.5)
+  override def visibility(point1: Vec3, point2: Vec3): Boolean =
+    rayMarchingVisibility(shapes, point1, point2)
 }

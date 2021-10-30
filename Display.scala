@@ -2,12 +2,13 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import javax.swing.JFrame
 import javax.swing.JPanel
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+
 import Graphics3D.Components._
-import Graphics3D.ColorConversions._
-import Graphics3D.LinearColors._
+import Graphics3D.ColorUtils._
 
 class Display(val image: BufferedImage) extends JPanel {
   override def paint(g: Graphics): Unit = {
@@ -40,7 +41,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    renderImage(Scenes.cornellBox).onComplete {
+    renderImage(Scenes.rayTracingTest).onComplete {
       case Success(image) =>
         val duration: Double = System.nanoTime - startTime
         println("Rendering took " + duration / 1e9 + " seconds")
@@ -53,6 +54,6 @@ object Main {
 
       case Failure(e) => e.printStackTrace()
     }
-    Thread.sleep(700000)
+    Thread.sleep(2000000)
   }
 }

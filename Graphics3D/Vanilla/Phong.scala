@@ -1,11 +1,12 @@
-package Graphics3D.Materials
+package Graphics3D.Vanilla
 
 import scala.math.pow
 
 import Graphics3D.Geometry._
 import Graphics3D.Color
 import Graphics3D.LinearColors._
-import Graphics3D.Components._
+import Graphics3D.Components.SURFACE_BIAS
+import Components.{Material, Light, Scene}
 
 case class Phong(diffuse: Color = LIGHT_GRAY,
                  specular: Color = WHITE,
@@ -22,19 +23,18 @@ case class Phong(diffuse: Color = LIGHT_GRAY,
 
     val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
 
-    def addLight(color: Color, light: PointLight): Color = {
-      val visibility = scene.visibility(biasedHitPoint, light)
-      if (visibility > 0) {
+    def addLight(color: Color, light: Light): Color = {
+      if (scene.visibility(biasedHitPoint, light.location)) {
 
         val lightVec = new Vec3(hitPoint, light.location).normalize
         val diffuseIntensity = lightVec dot normal
 
         if (diffuseIntensity > 0) {
-          val diffuseColor = diffuse * light.color * diffuseIntensity * visibility
+          val diffuseColor = diffuse * light.color * diffuseIntensity
 
           val specularIntensity = pow((lightVec - incident).normalize dot normal, shininess)
           if (specularIntensity > 0)
-            color + diffuseColor + (specular * light.color * specularIntensity * visibility)
+            color + diffuseColor + (specular * light.color * specularIntensity)
           else
             color + diffuseColor
         } else color

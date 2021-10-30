@@ -1,7 +1,6 @@
 package Graphics3D
 
 import scala.math.pow
-import Graphics3D.ColorConversions.createLinearColor
 
 class Color(val red: Double, val green: Double, val blue: Double) {
   def +(v: Color): Color = new Color(red + v.red, green + v.green, blue + v.blue)
@@ -13,7 +12,7 @@ class Color(val red: Double, val green: Double, val blue: Double) {
   def toHex: Int = ((red * 255).toInt << 16) | ((green * 255).toInt << 8) | (blue * 255).toInt
 }
 
-object ColorConversions {
+object ColorUtils {
   def exposureToneMap(color: Double, exposure: Double = 1): Double = 1 - math.exp(-color * exposure)
   def reinhardToneMap(color: Double): Double = color / (color + 1.0)
 
@@ -49,6 +48,8 @@ object ColorConversions {
 }
 
 object LinearColors {
+  import ColorUtils.createLinearColor
+
   val MEDIUM_VIOLET_RED: Color = createLinearColor(0xC71585)
   val DEEP_PINK: Color = createLinearColor(0xFF1493)
   val HOT_PINK: Color = createLinearColor(0xFF69B4)
@@ -95,9 +96,9 @@ object LinearColors {
   val HONEYDEV: Color = createLinearColor(0xF0FFF0)
   val AZURE: Color = createLinearColor(0x0FFFFF)
   val IVORY: Color = createLinearColor(0xFFFFF0)
-  val WHITE: Color = createLinearColor(0xFFFFFF)
+  val WHITE: Color = new Color(1, 1, 1)
 
-  val BLACK: Color = createLinearColor(0x000000)
+  val BLACK: Color = new Color(0, 0, 0)
   val GRAY: Color = createLinearColor(0x808080)
   val SILVER: Color = createLinearColor(0xC0C0C0)
   val LIGHT_GRAY: Color = createLinearColor(0xD3D3D3)

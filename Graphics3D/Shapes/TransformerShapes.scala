@@ -4,34 +4,33 @@ import scala.math.{abs, max, min}
 
 import Graphics3D.Geometry._
 import Graphics3D.Components._
-import Graphics3D.Materials.DummyMaterial
+import Graphics3D.Textures.Components.NoiseFunction
 
-case class NoisyShape(shape: RMShape, noise: NoiseFunction,
-                      noiseFrequency: Double = 1,
-                      noiseAmplifier: Double = 0.5,
-                      stepScale: Double = 0.5,
-                      override val material: Material = DummyMaterial()) extends RMShape {
+case class NoisyShape[M](shape: RMShape[M],
+                         noise: NoiseFunction,
+                         noiseFrequency: Double = 1,
+                         noiseAmplifier: Double = 0.5,
+                         stepScale: Double = 0.5,
+                         material: M) extends RMShape[M] {
 
   override def getDistance(point: Vec3): Double =
     (shape.getDistance(point) + noise(point * noiseFrequency) * noiseAmplifier) * stepScale
 }
 
-case class Intersection(shape1: RMShape, shape2: RMShape,
-                        override val material: Material = DummyMaterial()) extends RMShape {
+case class Intersection[M](shape1: RMShape[M], shape2: RMShape[M], material: M) extends RMShape[M] {
 
   override def getDistance(point: Vec3): Double =
     max(shape1.getDistance(point), shape2.getDistance(point))
 }
 
-case class Cut(shape: RMShape, cut: RMShape,
-               override val material: Material = DummyMaterial()) extends RMShape {
+case class Cut[M](shape: RMShape[M], cut: RMShape[M], material: M) extends RMShape[M] {
 
   override def getDistance(point: Vec3): Double =
     max(shape.getDistance(point), -cut.getDistance(point))
 }
 
-case class Blend(smoothness: Double, shape1: RMShape, shape2: RMShape,
-                 override val material: Material = DummyMaterial()) extends RMShape {
+case class Blend[M](smoothness: Double, shape1: RMShape[M], shape2: RMShape[M],
+                    material: M) extends RMShape[M] {
 
   def smoothMin(a: Double, b: Double): Double = {
     val h = max(smoothness - abs(a - b), 0) / smoothness

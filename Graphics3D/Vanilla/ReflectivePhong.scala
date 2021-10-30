@@ -1,15 +1,15 @@
-package Graphics3D.Materials
+package Graphics3D.Vanilla
 
 import Graphics3D.Geometry._
 import Graphics3D.Color
 import Graphics3D.LinearColors._
 import Graphics3D.Components._
+import Graphics3D.Vanilla.Components.{Material, Scene}
 
-case class Metal(diffuse: Color = SILVER,
-                 specular: Color = WHITE,
-                 shininess: Double = 128,
-                 ior: Double = 1.3,
-                 reflectivity: Double = 0) extends Material {
+case class ReflectivePhong(diffuse: Color = SILVER,
+                           specular: Color = WHITE,
+                           shininess: Double = 128,
+                           ior: Double = 1.3) extends Material {
 
   val phong: Phong = Phong(diffuse, specular, shininess)
 
@@ -24,9 +24,9 @@ case class Metal(diffuse: Color = SILVER,
 
     val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
     val cos = -(incident dot normal)
-    val reflectionRatio = reflectivity + (1 - reflectivity) * schlick(1, ior, cos)
+    val reflectionRatio = schlick(1, ior, cos)
     val reflectionColor = scene.castRay(biasedHitPoint, reflection(incident, normal), depth + 1)
 
-    diffuseColor * (1 - reflectionRatio) + reflectionColor * reflectionRatio
+    diffuseColor * (1 - reflectionRatio) + reflectionColor * specular * reflectionRatio
   }
 }

@@ -1,11 +1,12 @@
 package Graphics3D.Textures
 
-import Graphics3D.Geometry.Vec3
+import Graphics3D._
+import Geometry.Vec3
 import Graphics3D.Color
-import Graphics3D.ColorConversions._
-import Graphics3D.LinearColors._
-import Graphics3D.Components.TextureFunction
-import Graphics3D.Textures.TextureUtils._
+import ColorUtils._
+import LinearColors._
+import Textures.Components.TextureFunction
+import Textures.TextureUtils._
 
 object SampleTextures {
   val LIGHT_BLUE_SPOTS: TextureFunction =

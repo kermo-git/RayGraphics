@@ -1,7 +1,6 @@
 package Graphics3D
 
-import scala.util.Random
-import scala.math.{cos, sin, sqrt, abs, toRadians, random}
+import scala.math.{cos, sin, sqrt, abs, toRadians}
 
 object Geometry {
   type Matrix = Array[Array[Double]]
@@ -118,27 +117,10 @@ object Geometry {
     def invert: Vec3 = Vec3(-x, -y, -z)
   }
 
-  def fromSpherical(theta: Double, phi: Double): Vec3 = Vec3(
-    cos(phi) * sin(theta),
-    sin(phi) * sin(theta),
-    cos(theta)
-  )
-
   val ORIGIN: Vec3 = Vec3(0, 0, 0)
   val UNIT_X: Vec3 = Vec3(1, 0, 0)
   val UNIT_Y: Vec3 = Vec3(0, 1, 0)
   val UNIT_Z: Vec3 = Vec3(0, 0, 1)
-
-  private lazy val UNIT_VECTORS: Seq[Vec3] = {
-    def randSigned: Double = 2 * random() - 1
-    def randVector: Vec3 = Vec3(randSigned, randSigned, randSigned)
-
-    (for (_ <- 0 to 10000) yield randVector)
-      .filter(vec => vec.length <= 1)
-      .map(vec => vec.normalize)
-  }
-
-  def randUnitVector: Vec3 = UNIT_VECTORS(Random.nextInt(UNIT_VECTORS.length))
 
   def lerp(a: Double, b: Double, t: Double): Double = a + t * (b - a)
 

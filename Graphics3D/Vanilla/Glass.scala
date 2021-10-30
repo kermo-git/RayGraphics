@@ -1,13 +1,13 @@
-package Graphics3D.Materials
+package Graphics3D.Vanilla
 
 import Graphics3D.Geometry._
 import Graphics3D.Color
 import Graphics3D.LinearColors._
-import Graphics3D.Components._
+import Graphics3D.Components.SURFACE_BIAS
+import Components.{Material, Scene}
 
 case class Glass(color: Color = WHITE,
-                 ior: Double = 1.5,
-                 reflectivity: Double = 0) extends Material {
+                 ior: Double = 1.5) extends Material {
 
   override def shade(scene: Scene,
                      incident: Vec3,
@@ -26,7 +26,7 @@ case class Glass(color: Color = WHITE,
       case Some(ray) =>
         val cos = if (inside) -(ray dot normal) else -(incident dot normal)
 
-        val reflectionRatio = reflectivity + (1 - reflectivity) * schlick(n1, n2, cos)
+        val reflectionRatio = schlick(n1, n2, cos)
         val refractionColor = scene.castRay(hitPoint - hitPointOffset, ray, depth + 1, !inside)
         reflectionColor * reflectionRatio + refractionColor * (1 - reflectionRatio)
     }

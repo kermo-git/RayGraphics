@@ -1,16 +1,18 @@
-package Graphics3D.Scenes
+package Graphics3D.Vanilla
 
 import Graphics3D.Geometry.Vec3
 import Graphics3D.Color
 import Graphics3D.LinearColors.BLACK
-import Graphics3D.Components._
-import Graphics3D.RayObjectFunctions, RayObjectFunctions.traceRay
+import Graphics3D.Components.{Camera, RTShape}
+import Graphics3D.RayObjectFunctions.{rayTracingVisibility, traceRay}
+import Graphics3D.Textures.Components.TextureFunction
+import Components._
 
 class RayTracingScene(camera: Camera,
                       maxBounces: Int = 5,
-                      pointLights: List[PointLight] = Nil,
+                      pointLights: List[Light] = Nil,
 
-                      val shapes: List[RTShape],
+                      val shapes: List[RTShape[Material]],
                       val background: TextureFunction = _ => BLACK,
                       val backGroundScale: Double = 1
                      )
@@ -30,5 +32,6 @@ class RayTracingScene(camera: Camera,
     }
   }
 
-  override def visibility(point: Vec3, light: PointLight): Double = RayObjectFunctions.visibility(shapes, point, light)
+  override def visibility(point1: Vec3, point2: Vec3): Boolean =
+    rayTracingVisibility(shapes, point1, point2)
 }

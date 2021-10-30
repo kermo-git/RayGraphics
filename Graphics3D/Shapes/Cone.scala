@@ -4,10 +4,11 @@ import scala.math.{min, sqrt}
 
 import Graphics3D.Geometry._
 import Graphics3D.Components._
-import Graphics3D.Materials.DummyMaterial
 
-case class Cone(height: Double, radius: Double, transformation: Transformation,
-                override val material: Material = DummyMaterial()) extends RTShape with RMShape {
+case class Cone[M](height: Double,
+                   radius: Double,
+                   transformation: Transformation,
+                   material: M) extends RTShape[M] with RMShape[M] {
 
   private val normalTan = radius / height
 

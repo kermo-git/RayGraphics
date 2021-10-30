@@ -4,10 +4,11 @@ import scala.math.sqrt
 
 import Graphics3D.Geometry._
 import Graphics3D.Components._
-import Graphics3D.Materials.DummyMaterial
 
-case class Torus(mainRadius: Double, tubeRadius: Double, transformation: Transformation,
-                 override val material: Material = DummyMaterial()) extends RMShape {
+case class Torus[M](mainRadius: Double,
+                    tubeRadius: Double,
+                    transformation: Transformation,
+                    material: M) extends RMShape[M] {
 
   override def getNormal(point: Vec3): Vec3 = {
     val t = point * transformation.fullInverse

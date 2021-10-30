@@ -1,6 +1,7 @@
 package Graphics3D.Textures
 
 import scala.util.Random
+
 import Graphics3D.Geometry.{Vec3, lerp}
 
 object NoiseGenerator {
