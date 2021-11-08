@@ -7,11 +7,13 @@ import Graphics3D.Geometry.Vec3
 import Graphics3D.Components._
 
 object RayObjectFunctions {
+  case class HitInfo[M](material: M, hitPoint: Vec3, normal: Vec3)
+
   type ShapeDist[M] = Option[(Shape[M], Double)]
   type ShapeHit[M] = Option[(Shape[M], Vec3)]
 
-  def traceRay[M](shapes: List[RTShape[M]], origin: Vec3, direction: Vec3): ShapeDist[M] =
-    shapes.foldLeft[ShapeDist[M]](None)((prevResult, nextShape) =>
+  def traceRay[M](shapes: List[RTShape[M]], origin: Vec3, direction: Vec3): Option[HitInfo[M]] = {
+    val shapeDist = shapes.foldLeft[ShapeDist[M]](None)((prevResult, nextShape) =>
       nextShape.getRayHitDist(origin, direction) match {
         case None => prevResult
         case Some(nextDist) =>
@@ -25,6 +27,21 @@ object RayObjectFunctions {
                 nextResult
           }
       })
+
+    shapeDist match {
+      case None => None
+      case Some((shape, dist)) =>
+        val hitPoint = origin + direction * dist
+        val _normal = shape.getNormal(hitPoint)
+        val normal = if ((direction dot _normal) > 0) _normal.invert else _normal
+
+        Some(HitInfo(
+          shape.material,
+          hitPoint + normal * SURFACE_BIAS,
+          normal
+        ))
+    }
+  }
 
   def rayTracingVisibility[M](shapes: List[RTShape[M]], point1: Vec3, point2: Vec3): Boolean = {
     val pointToPoint = new Vec3(point2, point1)
@@ -49,7 +66,7 @@ object RayObjectFunctions {
 
   val RAY_HIT_THRESHOLD = 0.001
 
-  def marchRay[M](shapes: List[RMShape[M]], origin: Vec3, direction: Vec3, maxDist: Double): ShapeHit[M] = {
+  def marchRay[M](shapes: List[RMShape[M]], origin: Vec3, direction: Vec3, maxDist: Double): Option[HitInfo[M]] = {
     @tailrec
     def march(traveledDist: Double): ShapeHit[M] = {
       if (traveledDist > maxDist) None
@@ -65,7 +82,18 @@ object RayObjectFunctions {
         }
       }
     }
-    march(0)
+    march(0) match {
+      case None => None
+      case Some((shape, hitPoint)) =>
+        val _normal = shape.getNormal(hitPoint)
+        val normal = if ((direction dot _normal) > 0) _normal.invert else _normal
+
+        Some(HitInfo(
+          shape.material,
+          hitPoint + normal * SURFACE_BIAS,
+          normal
+        ))
+    }
   }
 
   def rayMarchingVisibility[M](shapes: List[RMShape[M]], point1: Vec3, point2: Vec3): Boolean = {

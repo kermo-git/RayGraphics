@@ -5,8 +5,7 @@ import scala.math.pow
 import Graphics3D.Geometry._
 import Graphics3D.Color
 import Graphics3D.LinearColors._
-import Graphics3D.Components.SURFACE_BIAS
-import Components.{Material, Light, Scene}
+import Components.{Material, Scene}
 
 case class Phong(diffuse: Color = LIGHT_GRAY,
                  specular: Color = WHITE,
@@ -21,10 +20,8 @@ case class Phong(diffuse: Color = LIGHT_GRAY,
                      depth: Int,
                      inside: Boolean): Color = {
 
-    val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
-
-    def addLight(color: Color, light: Light): Color = {
-      if (scene.visibility(biasedHitPoint, light.location)) {
+    scene.pointLights.foldLeft(ambient)((color, light) => {
+      if (scene.visibility(hitPoint, light.location)) {
 
         val lightVec = new Vec3(hitPoint, light.location).normalize
         val diffuseIntensity = lightVec dot normal
@@ -39,7 +36,6 @@ case class Phong(diffuse: Color = LIGHT_GRAY,
             color + diffuseColor
         } else color
       } else color
-    }
-    scene.pointLights.foldLeft(ambient)(addLight)
+    })
   }
 }

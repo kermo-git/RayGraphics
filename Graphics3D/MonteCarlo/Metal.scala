@@ -47,7 +47,7 @@ case class Metal(color: Color,
 
     BRDFResult(
       sample = light,
-      color = f * (g / (4 * normalDotView * normalDotHalf))
+      albedo = f * (g / (4 * normalDotView * normalDotHalf))
     )
   }
 }

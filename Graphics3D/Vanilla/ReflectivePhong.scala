@@ -3,13 +3,12 @@ package Graphics3D.Vanilla
 import Graphics3D.Geometry._
 import Graphics3D.Color
 import Graphics3D.LinearColors._
-import Graphics3D.Components._
 import Graphics3D.Vanilla.Components.{Material, Scene}
 
 case class ReflectivePhong(diffuse: Color = SILVER,
                            specular: Color = WHITE,
                            shininess: Double = 128,
-                           ior: Double = 1.3) extends Material {
+                           ior: Double = 1) extends Material {
 
   val phong: Phong = Phong(diffuse, specular, shininess)
 
@@ -22,10 +21,9 @@ case class ReflectivePhong(diffuse: Color = SILVER,
 
     val diffuseColor = phong.shade(scene, incident, hitPoint, normal, depth, inside)
 
-    val biasedHitPoint = hitPoint + normal * SURFACE_BIAS
     val cos = -(incident dot normal)
     val reflectionRatio = schlick(1, ior, cos)
-    val reflectionColor = scene.castRay(biasedHitPoint, reflection(incident, normal), depth + 1)
+    val reflectionColor = scene.castRay(hitPoint, reflection(incident, normal), depth + 1)
 
     diffuseColor * (1 - reflectionRatio) + reflectionColor * specular * reflectionRatio
   }

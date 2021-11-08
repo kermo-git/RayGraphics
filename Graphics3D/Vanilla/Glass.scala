@@ -16,18 +16,18 @@ case class Glass(color: Color = WHITE,
                      depth: Int,
                      inside: Boolean): Color = {
 
-    val hitPointOffset = normal * SURFACE_BIAS
-    val reflectionColor = scene.castRay(hitPoint + hitPointOffset, reflection(incident, normal), depth + 1, inside)
+    val reflectionColor = scene.castRay(hitPoint, reflection(incident, normal), depth + 1, inside)
 
     val (n1, n2) = if (inside) (ior, 1.0) else (1.0, ior)
 
     val result = refraction(incident, normal, n1, n2) match {
       case None => reflectionColor
       case Some(ray) =>
+        val biasedHitPoint = hitPoint - normal * 2 * SURFACE_BIAS
         val cos = if (inside) -(ray dot normal) else -(incident dot normal)
 
         val reflectionRatio = schlick(n1, n2, cos)
-        val refractionColor = scene.castRay(hitPoint - hitPointOffset, ray, depth + 1, !inside)
+        val refractionColor = scene.castRay(biasedHitPoint, ray, depth + 1, !inside)
         reflectionColor * reflectionRatio + refractionColor * (1 - reflectionRatio)
     }
     if (inside) result else result * color

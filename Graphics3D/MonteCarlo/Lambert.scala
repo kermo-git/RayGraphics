@@ -16,6 +16,6 @@ case class Lambert(color: Color, emission: Color = BLACK) extends Material {
   override def evaluate(view: Vec3, normal: Vec3): BRDFResult =
     BRDFResult(
       sample = (normal + randUnitVector).normalize,
-      color = color
+      albedo = color
     )
 }

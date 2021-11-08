@@ -65,39 +65,46 @@ object Scenes {
   val rayMarchingTest = new RayMarchingScene(
     camera = camera,
 
-    background = EXPLOSION,
-    backGroundScale = 4,
+    background = CLOUDS,
+    backgroundScale = 4,
 
     pointLights = List(
       Light(location = Vec3(0, 20, 30))
     ),
 
     shapes = List(
-      Blend(
-        smoothness = 5,
-        material = ReflectivePhong(HONEYDEV),
+      NoisyShape(
+        noise = perlinNoise,
+        noiseFrequency = 0.5,
+        noiseAmplifier = 1,
+        shape = Blend(
+          smoothness = 5,
+          material = ReflectivePhong(HONEYDEV),
 
-        shape1 = Plane(
-          point = Vec3(0, -8, 0),
-          material = null
+          shape1 = Plane(
+            point = Vec3(0, -8, 0),
+            material = null
+          ),
+          shape2 = Torus(
+            mainRadius = 10,
+            tubeRadius = 3,
+            transformation = new Transformation(10, -8, 30),
+            material = null
+          )
         ),
-        shape2 = Torus(
-          mainRadius = 10,
-          tubeRadius = 3,
-          transformation = new Transformation(10, -8, 30),
-          material = null
-        )
+        material = ReflectivePhong(HONEYDEV),
       ),
+
       Torus(
         mainRadius = 10,
         tubeRadius = 3,
         transformation = new Transformation(-30, 0, -30, -7, 5, 30),
-        material = ReflectivePhong(SADDLE_BROWN)
+        material = ReflectivePhong(AQUAMARINE)
       ),
       Sphere(
         center = Vec3(15, 5, 30),
         radius = 6,
-        material = ReflectivePhong(DEEP_SKY_BLUE)
+        material = ReflectivePhong(DARK_VIOLET)
       )
     )
   )
@@ -111,49 +118,49 @@ object Scenes {
       Plane(
         point = Vec3(-15, 0, 0),
         normal = UNIT_X,
-        material = MonteCarlo.Dielectric(HOT_PINK)
+        material = Dielectric(RED)
       ),
       Plane(
         point = Vec3(15, 0, 0),
         normal = UNIT_X,
-        material = MonteCarlo.Dielectric(GOLD)
+        material = Dielectric(LIME)
       ),
       Plane(
         point = Vec3(0, 0, -1),
         normal = UNIT_Z,
-        material = MonteCarlo.Dielectric(LIGHT_GRAY)
+        material = Dielectric(WHITE)
       ),
       Plane(
         point = Vec3(0, 0, 40),
         normal = UNIT_Z,
-        material = MonteCarlo.Dielectric(LIGHT_GRAY)
+        material = Dielectric(WHITE)
       ),
       Plane(
         point = Vec3(0, 15, 0),
         normal = UNIT_Y,
-        material = MonteCarlo.Dielectric(LIGHT_GRAY)
+        material = Dielectric(WHITE)
       ),
       Plane(
         point = Vec3(0, -15, 0),
         normal = UNIT_Y,
-        material = MonteCarlo.Dielectric(LIGHT_GRAY)
+        material = Dielectric(WHITE)
       ),
 
       // LIGHT SOURCE
       Sphere(
         center = Vec3(0, 20, 25),
         radius = 9,
-        material = MonteCarlo.Dielectric(color = LIGHT_GRAY, emission = WHITE * 10)
+        material = Dielectric(color = LIGHT_GRAY, emission = WHEAT * 10)
       ),
 
       // OBJECTS
       Box(lenX = 10, lenY = 20, lenZ = 7,
         transformation = new Transformation(0, -30, 0, -6, -7, 34),
-        material = MonteCarlo.Dielectric(LIGHT_GRAY)
+        material = Dielectric(LIGHT_GRAY)
       ),
       Box(lenX = 10, lenY = 10, lenZ = 7,
         transformation = new Transformation(0, 30, 0, 6, -10, 30),
-        material = MonteCarlo.Dielectric(LIGHT_GRAY)
+        material = Dielectric(LIGHT_GRAY)
       )
     )
   )
@@ -167,51 +174,51 @@ object Scenes {
       Plane(
         point = Vec3(-15, 0, 0),
         normal = UNIT_X,
-        material = MonteCarlo.Dielectric(RED)
+        material = Dielectric(RED)
       ),
       Plane(
         point = Vec3(15, 0, 0),
         normal = UNIT_X,
-        material = MonteCarlo.Dielectric(LIME)
+        material = Dielectric(LIME)
       ),
       Plane(
         point = Vec3(0, 0, -1),
         normal = UNIT_Z,
-        material = MonteCarlo.Dielectric(WHITE)
+        material = Dielectric(DEEP_SKY_BLUE)
       ),
       Plane(
         point = Vec3(0, 0, 50),
         normal = UNIT_Z,
-        material = MonteCarlo.Dielectric(WHITE)
+        material = Dielectric(DEEP_SKY_BLUE)
       ),
       Plane(
         point = Vec3(0, 15, 0),
         normal = UNIT_Y,
-        material = MonteCarlo.Dielectric(WHITE)
+        material = Dielectric(WHITE)
       ),
       Plane(
         point = Vec3(0, -15, 0),
         normal = UNIT_Y,
-        material = MonteCarlo.Dielectric(WHITE)
+        material = Dielectric(WHITE)
       ),
 
       // LIGHT SOURCE
       Sphere(
-        center = Vec3(0, 20, 25),
-        radius = 9,
-        material = MonteCarlo.Dielectric(color = GRAY, emission = WHITE * 15)
+        center = Vec3(0, 20, 30),
+        radius = 8,
+        material = Dielectric(color = GRAY, emission = WHITE * 15)
       ),
 
       // OBJECTS
       Sphere(
-        center = Vec3(0, -5, 40),
-        radius = 10,
-        material = MonteCarlo.Dielectric(color = GOLD, roughness = 0.3, reflectivity = 0.3)
+        center = Vec3(-8, -8, 30),
+        radius = 7,
+        material = Dielectric(AQUAMARINE)
       ),
       Sphere(
-        center = Vec3(10, -10, 30),
-        radius = 5,
-        material = MonteCarlo.Dielectric(color = DEEP_SKY_BLUE, reflectivity = 0.3)
+        center = Vec3(6, -6, 40),
+        radius = 9,
+        material = Dielectric(TAN)
       ),
     )
   )

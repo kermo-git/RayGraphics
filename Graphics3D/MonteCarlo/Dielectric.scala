@@ -63,13 +63,13 @@ case class Dielectric(color: Color,
 
       BRDFResult(
         sample = light,
-        color = new Color(r, r, r)
+        albedo = new Color(r, r, r)
       )
     } else {
       val light = (normal + randUnitVector).normalize
       BRDFResult(
         sample = light,
-        color = color
+        albedo = color
       )
     }
   }

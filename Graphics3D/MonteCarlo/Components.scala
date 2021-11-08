@@ -7,7 +7,7 @@ import Graphics3D.Geometry.Vec3
 import Graphics3D.Color
 
 object Components {
-  case class BRDFResult(sample: Vec3, color: Color)
+  case class BRDFResult(sample: Vec3, albedo: Color)
 
   trait Material {
     val emission: Color
@@ -23,7 +23,7 @@ object Components {
 
       BRDFResult(
         sample = light,
-        color = BRDF(view, normal, light) * (cosineLaw / probability)
+        albedo = BRDF(view, normal, light) * (cosineLaw / probability)
       )
     }
   }

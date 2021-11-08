@@ -3,7 +3,9 @@ package Graphics3D.MonteCarlo
 import scala.math.{max, random}
 
 import Graphics3D._
-import Geometry._, LinearColors.{BLACK, WHITE}, RayObjectFunctions.traceRay
+import Geometry._
+import LinearColors.{BLACK, WHITE}
+import RayObjectFunctions.{HitInfo, traceRay}
 import Graphics3D.Color, Graphics3D.Components._
 import Textures.Components.TextureFunction
 import MonteCarlo.Components.Material
@@ -14,7 +16,7 @@ class PathTracingScene(val camera: Camera,
                        val shapes: List[RTShape[Material]],
 
                        val background: TextureFunction = _ => BLACK,
-                       val backGroundScale: Double = 1) extends Renderable {
+                       val backgroundScale: Double = 1) extends Renderable {
 
   val imageWidth: Int = camera.imageWidth
   val imageHeight: Int = camera.imageHeight
@@ -32,24 +34,19 @@ class PathTracingScene(val camera: Camera,
 
   def castRay(origin: Vec3, direction: Vec3, throughput: Color = WHITE): Color = {
       traceRay(shapes, origin, direction) match {
-        case None => background(direction * backGroundScale) * throughput
-        case Some((shape, distance)) =>
-          val emissionValue = throughput * shape.material.emission
+        case None => background(direction * backgroundScale) * throughput
+        case Some(HitInfo(material, hitPoint, normal)) =>
+          val emissionValue = throughput * material.emission
 
-          val hitPoint = origin + direction * distance
-          val _normal = shape.getNormal(hitPoint)
-          val normal = if ((direction dot _normal) > 0) _normal.invert else _normal
-          val nextOrigin = hitPoint + normal * SURFACE_BIAS
-
-          val brdfResult = shape.material.evaluate(direction.invert, normal)
-          val nextThroughput = throughput * brdfResult.color
+          val brdfResult = material.evaluate(direction.invert, normal)
+          val nextThroughput = throughput * brdfResult.albedo
 
           val p = max(nextThroughput.red, max(nextThroughput.green, nextThroughput.blue))
 
           if (random() > p)
             emissionValue
           else {
-            emissionValue + castRay(nextOrigin, brdfResult.sample, nextThroughput * (1 / p))
+            emissionValue + castRay(hitPoint, brdfResult.sample, nextThroughput * (1 / p))
           }
       }
   }
