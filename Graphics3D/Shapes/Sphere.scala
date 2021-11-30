@@ -10,7 +10,7 @@ case class Sphere[M](center: Vec3,
   override def getNormal(point: Vec3): Vec3 = new Vec3(center, point).normalize
   override def getDistance(point: Vec3): Double = new Vec3(center, point).length - radius
 
-  val equationConst: Double = (center dot center) - radius * radius
+  private val equationConst = (center dot center) - radius * radius
 
   override def getRayHitDist(origin: Vec3, direction: Vec3): Option[Double] = {
     val a = direction dot direction
