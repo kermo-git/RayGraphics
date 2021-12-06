@@ -41,7 +41,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
-    renderImage(Scenes.cornellBoxBalls).onComplete {
+    renderImage(Scenes.spiral).onComplete {
       case Success(image) =>
         val duration: Double = System.nanoTime - startTime
         println("Rendering took " + duration / 1e9 + " seconds")

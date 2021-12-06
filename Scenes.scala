@@ -7,31 +7,8 @@ import Textures.TextureUtils._
 import Shapes._
 import Vanilla._, Vanilla.Components.Light
 import MonteCarlo._
-import Textures.Components.{NoiseDisplay, TextureDisplay}
 
 object Scenes {
-  def colorTest(color: Color): Renderable = new Renderable {
-    override val imageWidth: Int = 600
-    override val imageHeight: Int = 600
-
-    override def getPixelColor(x: Int, y: Int): Color = color
-  }
-
-  val noise = new NoiseDisplay(
-    imageWidth = 600,
-    imageHeight = 600,
-    unitSizePx = 30,
-    noise = octaveNoise(perlinNoise)()
-  )
-
-  val texture = new TextureDisplay(
-    imageWidth = 600,
-    imageHeight = 600,
-    unitSizePx = 100,
-    textureZ = 0.3,
-    texture = FIRE
-  )
-
   val camera: Camera = Camera(600, 600, 70)
 
   val rayTracingTest = new RayTracingScene(
@@ -105,6 +82,41 @@ object Scenes {
         center = Vec3(15, 5, 30),
         radius = 6,
         material = ReflectivePhong(DARK_VIOLET)
+      )
+    )
+  )
+
+  val spiral = new RayMarchingScene(
+    camera = camera,
+
+    background = CLOUDS,
+    backgroundScale = 7,
+
+    pointLights = List(
+      Light(location = Vec3(40, 20, 40))
+    ),
+
+    shapes = List(
+      NoisyShape(
+        shape = TransformedTorus(
+          mainRadius = 5,
+          tubeRadius = 1,
+
+          twist = 0.1,
+          elongationX = 5,
+          elongationZ = 2,
+          elongationY = 80,
+
+          transformation = new Transformation(10, 0, 50, 0, 0, 60),
+          stepScale = 0.7,
+
+          material = ReflectivePhong(INDIGO)
+        ),
+        noise = octaveNoise(absPerlinNoise)(),
+        noiseFrequency = 0.3,
+
+        stepScale = 0.7,
+        material = ReflectivePhong(OLIVE_DRAB)
       )
     )
   )
