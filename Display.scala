@@ -7,8 +7,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-import Graphics3D.Components._
-import Graphics3D.ColorUtils._
+import RayGraphics.Components._
+import RayGraphics.ColorUtils._
 
 class Display(val image: BufferedImage) extends JPanel {
   override def paint(g: Graphics): Unit = {

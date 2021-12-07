@@ -1,4 +1,4 @@
-import Graphics3D._
+import RayGraphics._
 import Geometry._
 import LinearColors._
 import Components._
