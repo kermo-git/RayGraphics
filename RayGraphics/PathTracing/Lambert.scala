@@ -1,4 +1,4 @@
-package RayGraphics.MonteCarlo
+package RayGraphics.PathTracing
 
 import scala.math.Pi
 

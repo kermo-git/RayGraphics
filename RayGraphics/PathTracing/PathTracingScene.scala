@@ -1,4 +1,4 @@
-package RayGraphics.MonteCarlo
+package RayGraphics.PathTracing
 
 import scala.math.{max, random}
 
@@ -8,7 +8,7 @@ import LinearColors.{BLACK, WHITE}
 import RayObjectFunctions.{HitInfo, traceRay}
 import RayGraphics.Color, RayGraphics.Components._
 import Textures.Components.TextureFunction
-import MonteCarlo.Components.Material
+import PathTracing.Components.Material
 
 class PathTracingScene(val camera: Camera,
                        val samplesPerPixel: Int,

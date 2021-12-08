@@ -1,9 +1,9 @@
-package RayGraphics.Vanilla
+package RayGraphics.SimpleRayTracing
 
 import RayGraphics.Geometry._
 import RayGraphics.Color
 import RayGraphics.LinearColors._
-import RayGraphics.Vanilla.Components.{Material, Scene}
+import RayGraphics.SimpleRayTracing.Components.{Material, Scene}
 
 case class ReflectivePhong(diffuse: Color = SILVER,
                            specular: Color = WHITE,

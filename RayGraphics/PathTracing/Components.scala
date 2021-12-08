@@ -1,4 +1,4 @@
-package RayGraphics.MonteCarlo
+package RayGraphics.PathTracing
 
 import scala.util.Random
 import scala.math.{Pi, random}

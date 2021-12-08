@@ -5,8 +5,8 @@ import Components._
 import Textures.SampleTextures._
 import Textures.TextureUtils._
 import Shapes._
-import Vanilla._, Vanilla.Components.Light
-import MonteCarlo._
+import SimpleRayTracing._, SimpleRayTracing.Components.Light
+import PathTracing._
 
 object Scenes {
   val camera: Camera = Camera(600, 600, 70)

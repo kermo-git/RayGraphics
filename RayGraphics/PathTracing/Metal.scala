@@ -1,4 +1,4 @@
-package RayGraphics.MonteCarlo
+package RayGraphics.PathTracing
 
 import RayGraphics.Geometry._
 import RayGraphics.Color

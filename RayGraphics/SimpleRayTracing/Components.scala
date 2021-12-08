@@ -1,4 +1,4 @@
-package RayGraphics.Vanilla
+package RayGraphics.SimpleRayTracing
 
 import RayGraphics.Geometry.{ORIGIN, Vec3}
 import RayGraphics.Color
