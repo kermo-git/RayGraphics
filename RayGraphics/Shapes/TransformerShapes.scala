@@ -4,10 +4,10 @@ import scala.math.{abs, max, min}
 
 import RayGraphics.Geometry._
 import RayGraphics.Components._
-import RayGraphics.Textures.Components.NoiseFunction
+import RayGraphics.Textures.Components.Noise
 
 case class NoisyShape[M](shape: RMShape[M],
-                         noise: NoiseFunction,
+                         noise: Noise,
                          noiseFrequency: Double = 1,
                          noiseAmplifier: Double = 0.5,
                          stepScale: Double = 0.5,

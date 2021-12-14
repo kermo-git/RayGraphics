@@ -5,14 +5,16 @@ import RayGraphics.Color
 import RayGraphics.Components.Renderable
 
 object Components {
-  type NoiseFunction = Vec3 => Double
-  type TextureFunction = Vec3 => Color
+  type Noise = Vec3 => Double
+  type Texture = Vec3 => Color
+
+  def scaleTexture(f: Texture, m: Double): Texture = p => f(p * m)
 
   class NoiseDisplay(val imageWidth: Int,
                      val imageHeight: Int,
                      val unitSizePx: Int,
                      val noiseZ: Double = 0,
-                     val noise: NoiseFunction) extends Renderable {
+                     val noise: Noise) extends Renderable {
 
     override def getPixelColor(x: Int, y: Int): Color = {
       val noiseX = 1.0 * x / unitSizePx
@@ -26,7 +28,7 @@ object Components {
                        val imageHeight: Int,
                        val unitSizePx: Int,
                        val textureZ: Double = 0,
-                       val texture: TextureFunction) extends Renderable {
+                       val texture: Texture) extends Renderable {
 
     override def getPixelColor(x: Int, y: Int): Color = {
       val textureX = 1.0 * x / unitSizePx

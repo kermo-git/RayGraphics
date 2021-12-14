@@ -3,7 +3,7 @@ package RayGraphics.SimpleRayTracing
 import RayGraphics.Geometry._
 import RayGraphics.Color
 import RayGraphics.LinearColors._
-import RayGraphics.SimpleRayTracing.Components.{Material, Scene}
+import RayGraphics.SimpleRayTracing.Components.{Material, SceneRenderer}
 
 case class ReflectivePhong(diffuse: Color = SILVER,
                            specular: Color = WHITE,
@@ -12,18 +12,18 @@ case class ReflectivePhong(diffuse: Color = SILVER,
 
   val phong: Phong = Phong(diffuse, specular, shininess)
 
-  override def shade(scene: Scene,
+  override def shade(renderer: SceneRenderer,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,
                      depth: Int,
                      inside: Boolean): Color = {
 
-    val diffuseColor = phong.shade(scene, incident, hitPoint, normal, depth, inside)
+    val diffuseColor = phong.shade(renderer, incident, hitPoint, normal, depth, inside)
 
     val cos = -(incident dot normal)
     val reflectionRatio = schlick(1, ior, cos)
-    val reflectionColor = scene.castRay(hitPoint, reflection(incident, normal), depth + 1)
+    val reflectionColor = renderer.castRay(hitPoint, reflection(incident, normal), depth + 1)
 
     diffuseColor * (1 - reflectionRatio) + reflectionColor * specular * reflectionRatio
   }

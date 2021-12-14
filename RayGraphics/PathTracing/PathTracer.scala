@@ -5,18 +5,12 @@ import scala.math.{max, random}
 import RayGraphics._
 import Geometry._
 import LinearColors.{BLACK, WHITE}
-import RayObjectFunctions.{HitInfo, traceRay}
 import RayGraphics.Color, RayGraphics.Components._
-import Textures.Components.TextureFunction
 import PathTracing.Components.Material
 
-class PathTracingScene(val camera: Camera,
-                       val samplesPerPixel: Int,
-
-                       val shapes: List[RTShape[Material]],
-
-                       val background: TextureFunction = _ => BLACK,
-                       val backgroundScale: Double = 1) extends Renderable {
+class PathTracer(val camera: Camera,
+                 val samplesPerPixel: Int,
+                 val scene: Scene[Material]) extends Renderable {
 
   val imageWidth: Int = camera.imageWidth
   val imageHeight: Int = camera.imageHeight
@@ -33,9 +27,9 @@ class PathTracingScene(val camera: Camera,
   }
 
   def castRay(origin: Vec3, direction: Vec3, throughput: Color = WHITE): Color = {
-      traceRay(shapes, origin, direction) match {
-        case None => background(direction * backgroundScale) * throughput
-        case Some(HitInfo(material, hitPoint, normal)) =>
+      scene.trace(origin, direction) match {
+        case scene.Nohit(color) => color * throughput
+        case scene.HitInfo(material, hitPoint, normal) =>
           val emissionValue = throughput * material.emission
 
           val brdfResult = material.evaluate(direction.invert, normal)
