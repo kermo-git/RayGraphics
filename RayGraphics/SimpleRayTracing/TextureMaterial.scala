@@ -3,12 +3,12 @@ package RayGraphics.SimpleRayTracing
 import RayGraphics.Geometry._
 import RayGraphics.Color
 import RayGraphics.Textures.Components.Texture
-import Components.{Material, SceneRenderer}
+import Components.{Material, SimpleRayTracer}
 
 case class TextureMaterial(texture: Texture,
                            shininess: Double = 128) extends Material {
 
-  override def shade(renderer: SceneRenderer,
+  override def shade(renderer: SimpleRayTracer,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,

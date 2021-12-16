@@ -1,10 +1,11 @@
 package RayGraphics.SimpleRayTracing
 
 import scala.math.pow
+
 import RayGraphics.Geometry._
 import RayGraphics.Color
 import RayGraphics.LinearColors._
-import Components.{Material, SceneRenderer}
+import Components.{Material, SimpleRayTracer}
 
 case class Phong(diffuse: Color = LIGHT_GRAY,
                  specular: Color = WHITE,
@@ -12,7 +13,7 @@ case class Phong(diffuse: Color = LIGHT_GRAY,
 
   private val ambient = diffuse * 0.1
 
-  override def shade(renderer: SceneRenderer,
+  override def shade(renderer: SimpleRayTracer,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,

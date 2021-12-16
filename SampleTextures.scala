@@ -1,23 +1,12 @@
-package RayGraphics.Textures
-
 import RayGraphics._
-import Geometry.Vec3
 import RayGraphics.Color
-import ColorUtils._
+import ColorUtils.{createLinearColor, lerp}
+import Geometry.Vec3
 import LinearColors._
 import Textures.Components.Texture
 import Textures.TextureUtils._
 
 object SampleTextures {
-  val LIGHT_BLUE_SPOTS: Texture =
-    smoothColorBands(perlinNoise)(DARK_BLUE, MEDIUM_BLUE, DEEP_SKY_BLUE, MEDIUM_BLUE)
-
-  val PINK_BLUE_TEXTURE: Texture =
-    smoothColorBands(perlinNoise)(BLACK, HOT_PINK, BLACK, DEEP_SKY_BLUE, BLACK)
-
-  val FIRE: Texture =
-    smoothColorBands(octaveNoise(perlinNoise)(octaves = 6, persistence = 0.6))(YELLOW, GOLD, ORANGE_RED, RED)
-
   val LAVA_ROCK: Texture =
     smoothColorBands(octaveNoise(absPerlinNoise)())(ORANGE_RED, BLACK, GRAY, GRAY, GRAY)
 

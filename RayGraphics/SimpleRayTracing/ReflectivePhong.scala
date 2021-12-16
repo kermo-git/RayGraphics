@@ -3,7 +3,7 @@ package RayGraphics.SimpleRayTracing
 import RayGraphics.Geometry._
 import RayGraphics.Color
 import RayGraphics.LinearColors._
-import RayGraphics.SimpleRayTracing.Components.{Material, SceneRenderer}
+import Components.{Material, SimpleRayTracer}
 
 case class ReflectivePhong(diffuse: Color = SILVER,
                            specular: Color = WHITE,
@@ -12,7 +12,7 @@ case class ReflectivePhong(diffuse: Color = SILVER,
 
   val phong: Phong = Phong(diffuse, specular, shininess)
 
-  override def shade(renderer: SceneRenderer,
+  override def shade(renderer: SimpleRayTracer,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,

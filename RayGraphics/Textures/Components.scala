@@ -8,8 +8,6 @@ object Components {
   type Noise = Vec3 => Double
   type Texture = Vec3 => Color
 
-  def scaleTexture(f: Texture, m: Double): Texture = p => f(p * m)
-
   class NoiseDisplay(val imageWidth: Int,
                      val imageHeight: Int,
                      val unitSizePx: Int,

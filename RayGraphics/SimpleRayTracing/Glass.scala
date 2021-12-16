@@ -4,12 +4,12 @@ import RayGraphics.Geometry._
 import RayGraphics.Color
 import RayGraphics.LinearColors._
 import RayGraphics.Components.SURFACE_BIAS
-import Components.{Material, SceneRenderer}
+import Components.{Material, SimpleRayTracer}
 
 case class Glass(color: Color = WHITE,
                  ior: Double = 1.5) extends Material {
 
-  override def shade(renderer: SceneRenderer,
+  override def shade(renderer: SimpleRayTracer,
                      incident: Vec3,
                      hitPoint: Vec3,
                      normal: Vec3,

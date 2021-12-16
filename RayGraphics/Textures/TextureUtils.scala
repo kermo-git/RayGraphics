@@ -1,12 +1,12 @@
 package RayGraphics.Textures
 
 import scala.annotation.tailrec
-import scala.math.{abs, min}
 
+import scala.math.{abs, min}
 import RayGraphics.Geometry.Vec3
 import RayGraphics.Color
 import RayGraphics.ColorUtils.lerp
-import Components.Noise
+import Components.{Noise, Texture}
 import NoiseGenerator._
 
 object TextureUtils {
@@ -29,6 +29,8 @@ object TextureUtils {
     }
     octave()
   }
+
+  def scaleTexture(f: Texture, m: Double): Texture = p => f(p * m)
 
   def colorBands(noise: Noise)(colors: Color*)(point: Vec3): Color =
     colors((noise(point) * colors.length).toInt)
