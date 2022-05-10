@@ -55,12 +55,12 @@ object Components {
     }
   }
 
-  trait Shape[M] {
+  trait Shape[+M] {
     val material: M
     def getNormal(point: Vec3): Vec3
   }
 
-  trait RTShape[M] extends Shape[M] {
+  trait RTShape[+M] extends Shape[M] {
     def getRayHitDist(origin: Vec3, direction: Vec3): Option[Double]
   }
 
@@ -72,7 +72,7 @@ object Components {
     Vec3(0, 0, 0.001)
   )
 
-  trait RMShape[M] extends Shape[M] {
+  trait RMShape[+M] extends Shape[M] {
     def getDistance(point: Vec3): Double
 
     override def getNormal(point: Vec3): Vec3 = {

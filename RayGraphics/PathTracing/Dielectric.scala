@@ -9,8 +9,8 @@ import Components._
 
 case class Dielectric(color: Color,
                       reflectivity: Double = 0.04,
-                      emission: Color = BLACK,
-                      override val roughness: Double = 0.5) extends CookTorrance(roughness) {
+                      override val emission: Color = BLACK,
+                      override val roughness: Double = 0.5) extends CookTorrance with Material {
 
   val F0: Color = new Color(reflectivity, reflectivity, reflectivity)
 

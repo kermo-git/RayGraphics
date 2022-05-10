@@ -7,12 +7,9 @@ import RayGraphics.Geometry.Vec3
 import RayGraphics.LinearColors.BLACK
 import RayGraphics.Textures.Components.Texture
 
-case class RayTracingScene[M](
-                               shapes: List[RTShape[M]],
-                               background: Texture = _ => BLACK,
-                               override val lights: List[PointLight] = Nil
-                             )
-  extends Scene[M](lights) {
+case class RayTracingScene[M](shapes: List[RTShape[M]],
+                              background: Texture = _ => BLACK,
+                              override val lights: List[PointLight] = Nil) extends Scene[M](lights) {
 
   type Shape = RTShape[M]
   type ShapeDist = Option[(Shape, Double)]

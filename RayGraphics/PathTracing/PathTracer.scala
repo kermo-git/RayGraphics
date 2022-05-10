@@ -40,9 +40,8 @@ case class PathTracer(camera: Camera,
 
           if (random() > p)
             emissionValue
-          else {
+          else
             emissionValue + castRay(hitPoint, brdfResult.sample, nextThroughput * (1 / p))
-          }
       }
   }
 }

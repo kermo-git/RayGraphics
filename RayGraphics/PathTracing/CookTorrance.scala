@@ -5,16 +5,16 @@ import scala.util.Random
 
 import RayGraphics.Geometry.{Vec3, coordinateSystem}
 import RayGraphics.Color
-import Components.Material
 
 // Papers:
 // https://lsi2.ugr.es/rosana/investigacion/tesis/phd_rmontes.pdf (Read this first)
 // https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.pdf
 // https://cseweb.ucsd.edu/~ravir/papers/brdf/brdf.pdf
 
-abstract class CookTorrance(val roughness: Double) extends Material {
-  // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-  // http://www.codinglabs.net/article_physically_based_rendering_cook_torrance.aspx
+// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
+// http://www.codinglabs.net/article_physically_based_rendering_cook_torrance.aspx
+trait CookTorrance {
+  val roughness: Double
 
   val alpha: Double = roughness * roughness
   val alpha2: Double = alpha * alpha

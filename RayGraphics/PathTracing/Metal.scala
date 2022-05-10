@@ -3,11 +3,11 @@ package RayGraphics.PathTracing
 import RayGraphics.Geometry._
 import RayGraphics.Color
 import RayGraphics.LinearColors.BLACK
-import Components.BRDFResult
+import Components.{BRDFResult, Material}
 
 case class Metal(color: Color,
-                 emission: Color = BLACK,
-                 override val roughness: Double = 0.2) extends CookTorrance(roughness) {
+                 override val emission: Color = BLACK,
+                 override val roughness: Double = 0.2) extends CookTorrance with Material {
 
   override def sample(view: Vec3, normal: Vec3): Vec3 = {
     val half = randMicroNormal(normal)

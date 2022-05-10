@@ -10,11 +10,7 @@ import scala.util.{Failure, Success}
 import RayGraphics.Components._
 import RayGraphics.ColorUtils._
 
-class Display(val image: BufferedImage) extends JPanel {
-  override def paint(g: Graphics): Unit = {
-    g.drawImage(image, 0, 0, this)
-  }
-}
+import java.io.File
 
 object Main {
   def renderImage(renderable: Renderable): Future[BufferedImage] = {
@@ -38,6 +34,27 @@ object Main {
     })
   }
 
+  def imageToFile(image: BufferedImage, filePath: String): Unit = {
+    import javax.imageio.ImageIO
+    val outputfile = new File(filePath)
+    ImageIO.write(image, "jpg", outputfile)
+  }
+
+  def displayImageInWindow(image: BufferedImage): Unit = {
+
+    class Display(val image: BufferedImage) extends JPanel {
+      override def paint(g: Graphics): Unit = {
+        g.drawImage(image, 0, 0, this)
+      }
+    }
+
+    val frame = new JFrame
+    frame.setTitle("3D Graphics")
+    frame.setSize(image.getWidth, image.getHeight)
+    frame.add(new Display(image))
+    frame.setVisible(true)
+  }
+
   def main(args: Array[String]): Unit = {
     val startTime = System.nanoTime
 
@@ -45,13 +62,7 @@ object Main {
       case Success(image) =>
         val duration: Double = System.nanoTime - startTime
         println("Rendering took " + duration / 1e9 + " seconds")
-
-        val frame = new JFrame
-        frame.setTitle("3D Graphics")
-        frame.setSize(image.getWidth, image.getHeight)
-        frame.add(new Display(image))
-        frame.setVisible(true)
-
+        displayImageInWindow(image)
       case Failure(e) => e.printStackTrace()
     }
     Thread.sleep(2000000)
