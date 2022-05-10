@@ -1,18 +1,12 @@
 import java.awt.image.BufferedImage
-import java.awt.Graphics
-import javax.swing.JFrame
-import javax.swing.JPanel
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
-
-import RayGraphics.Components._
-import RayGraphics.ColorUtils._
-
-import java.io.File
 
 object Main {
+  import scala.concurrent.ExecutionContext.Implicits.global
+  import scala.concurrent.Future
+
+  import RayGraphics.Components._
+  import RayGraphics.ColorUtils._
+
   def renderImage(renderable: Renderable): Future[BufferedImage] = {
     val w = renderable.imageWidth
     val h = renderable.imageHeight
@@ -35,12 +29,17 @@ object Main {
   }
 
   def imageToFile(image: BufferedImage, filePath: String): Unit = {
+    import java.io.File
     import javax.imageio.ImageIO
+
     val outputfile = new File(filePath)
     ImageIO.write(image, "jpg", outputfile)
   }
 
   def displayImageInWindow(image: BufferedImage): Unit = {
+    import java.awt.Graphics
+    import javax.swing.JFrame
+    import javax.swing.JPanel
 
     class Display(val image: BufferedImage) extends JPanel {
       override def paint(g: Graphics): Unit = {
@@ -56,6 +55,8 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
+    import scala.util.{Failure, Success}
+
     val startTime = System.nanoTime
 
     renderImage(SampleScenes.pathTracingWithRayTracing).onComplete {
