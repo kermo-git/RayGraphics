@@ -5,7 +5,7 @@ import scala.math.{max, random}
 import RayGraphics._
 import Geometry._
 import RayGraphics.Color
-import LinearColors.{BLACK, WHITE}
+import LinearColors.WHITE
 import RayGraphics.Components._
 import PathTracing.Components.Material
 
@@ -19,29 +19,26 @@ case class PathTracer(camera: Camera,
   private val avgMultiplier = 1.0 / samplesPerPixel
 
   override def getPixelColor(x: Int, y: Int): Color = {
-    def sampleSum(i: Int = samplesPerPixel): Color = {
-      val currentSample = castRay(ORIGIN, camera.getRandomCameraRay(x, y))
-      val remainingSamples = if (i == 0) BLACK else sampleSum(i - 1)
-      currentSample + remainingSamples
-    }
-    sampleSum() * avgMultiplier
+    val samples = for (_ <- 1 to samplesPerPixel)
+      yield castRay(ORIGIN, camera.getRandomCameraRay(x, y))
+    samples.reduce(_ + _) * avgMultiplier
   }
 
   def castRay(origin: Vec3, direction: Vec3, throughput: Color = WHITE): Color = {
-      scene.trace(origin, direction) match {
-        case Nohit(color) => color * throughput
-        case HitInfo(material, hitPoint, normal) =>
-          val emissionValue = throughput * material.emission
+    scene.trace(origin, direction) match {
+      case Nohit(color) => color * throughput
+      case HitInfo(material, hitPoint, normal) =>
+        val emissionValue = throughput * material.emission
 
-          val brdfResult = material.evaluate(direction.invert, normal)
-          val nextThroughput = throughput * brdfResult.albedo
+        val brdfResult = material.evaluate(direction.invert, normal)
+        val nextThroughput = throughput * brdfResult.albedo
 
-          val p = max(nextThroughput.red, max(nextThroughput.green, nextThroughput.blue))
+        val p = max(nextThroughput.red, max(nextThroughput.green, nextThroughput.blue))
 
-          if (random() > p)
-            emissionValue
-          else
-            emissionValue + castRay(hitPoint, brdfResult.sample, nextThroughput * (1 / p))
-      }
+        if (random() > p)
+          emissionValue
+        else
+          emissionValue + castRay(hitPoint, brdfResult.sample, nextThroughput * (1 / p))
+    }
   }
 }

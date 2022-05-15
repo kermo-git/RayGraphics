@@ -10,7 +10,7 @@ case class ReflectivePhong(diffuse: Color = SILVER,
                            shininess: Double = 128,
                            ior: Double = 1) extends Material {
 
-  val phong: Phong = Phong(diffuse, specular, shininess)
+  private val phong = Phong(diffuse, specular, shininess)
 
   override def shade(renderer: SimpleRayTracer,
                      incident: Vec3,
