@@ -16,6 +16,8 @@ object Components {
                     imageHeight: Int,
                     FOVDegrees: Int) {
 
+    val location: Vec3 = ORIGIN
+
     private val imagePlaneWidth = 2 * tan(toRadians(FOVDegrees / 2))
     private val imagePlaneHeight = imagePlaneWidth * imageHeight / imageWidth
 

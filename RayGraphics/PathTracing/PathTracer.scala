@@ -20,7 +20,7 @@ case class PathTracer(camera: Camera,
 
   override def getPixelColor(x: Int, y: Int): Color = {
     val samples = for (_ <- 1 to samplesPerPixel)
-      yield castRay(ORIGIN, camera.getRandomCameraRay(x, y))
+      yield castRay(camera.location, camera.getRandomCameraRay(x, y))
     samples.reduce(_ + _) * avgMultiplier
   }
 

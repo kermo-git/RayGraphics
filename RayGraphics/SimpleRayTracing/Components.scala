@@ -1,6 +1,6 @@
 package RayGraphics.SimpleRayTracing
 
-import RayGraphics.Geometry.{ORIGIN, Vec3}
+import RayGraphics.Geometry.Vec3
 import RayGraphics.Color
 import RayGraphics.LinearColors.BLACK
 import RayGraphics.Components._
@@ -14,7 +14,7 @@ object Components {
     val imageHeight: Int = camera.imageHeight
 
     override def getPixelColor(x: Int, y: Int): Color =
-      castRay(ORIGIN, camera.getCameraRay(x, y))
+      castRay(camera.location, camera.getCameraRay(x, y))
 
     def castRay(origin: Vec3, direction: Vec3, depth: Int = 0, inside: Boolean = false): Color = {
       if (depth > maxBounces) BLACK
