@@ -4,43 +4,62 @@ import scala.math.{max, random}
 
 import RayGraphics.Color
 import RayGraphics.Geometry.Vec3
-import RayGraphics.Components.{Camera, HitInfo, Nohit, Scene}
+import RayGraphics.Components.{Camera, HitInfo, Nohit, Renderable, Scene}
 import RayGraphics.LinearColors.{BLACK, WHITE}
 import RayGraphics.PathTracing.Components._
 
 // https://cescg.org/wp-content/uploads/2018/04/Vlnas-Bidirectional-Path-Tracing-1.pdf
 
-class LightSample(val location: Vec3, val direction: Vec3, val emission: Color)
+case class LightSample(location: Vec3, direction: Vec3, emission: Color)
 
 case class BidirectionalTracer(camera: Camera,
-                               scene: Scene[Material],
-                               getLightSample: () => LightSample) {
+                               samplesPerPixel: Int,
+                               getLightSample: () => LightSample,
+                               scene: Scene[Material]) extends Renderable {
 
-  class Node(val material: Material,
-             val location: Vec3,
-             val normal: Vec3,
-             val toPrevNode: Vec3,
-             val toNextNode: Vec3,
-             val throughput: Color = WHITE)
+  val imageWidth: Int = camera.imageWidth
+  val imageHeight: Int = camera.imageHeight
+
+  case class Node(material: Material,
+                  location: Vec3,
+                  normal: Vec3,
+                  toPrevNode: Vec3,
+                  toNextNode: Vec3,
+                  throughput: Color = WHITE)
 
   type Path = List[Node]
+  private val avgMultiplier = 1.0 / samplesPerPixel
 
-  def calculateSample(cameraRayDirection: Vec3): Color = {
-    val lightSample = getLightSample()
-    val eyePath = generatePath(camera.location, cameraRayDirection)
-    val lightPath = generatePath(lightSample.location, lightSample.direction)
-    lightSample.emission * connectPaths(eyePath, lightPath)
+  override def getPixelColor(x: Int, y: Int): Color = {
+    val cameraRayDirection = camera.getCameraRay(x, y)
+
+    val samples = for (_ <- 1 to samplesPerPixel) yield {
+      val lightSample = getLightSample()
+      val eyePath = generatePath(camera.location, cameraRayDirection)
+
+      eyePath match {
+        case Nil => BLACK
+        case firstHit :: _ =>
+          val lightPath = generatePath(lightSample.location, lightSample.direction)
+          if (lightPath.isEmpty)
+            BLACK
+          else
+            lightSample.emission * connectPaths(eyePath, lightPath) + firstHit.material.emission
+      }
+    }
+    samples.reduce(_ + _) * avgMultiplier
   }
 
-  def generatePath(origin: Vec3, direction: Vec3, throughput: Color = WHITE): List[Node] = {
+  def generatePath(origin: Vec3, direction: Vec3, throughput: Color = WHITE, result: Path = Nil): Path = {
     scene.trace(origin, direction) match {
+      case Nohit(_) => result
       case HitInfo(material, hitPoint, normal) =>
         val brdfResult = material.evaluate(direction.invert, normal)
         val nextThroughput = brdfResult.albedo * throughput
         val p = max(nextThroughput.red, max(nextThroughput.green, nextThroughput.blue))
 
         if (random() < p) {
-          val next = new Node(
+          val next = Node(
             material = material,
             location = hitPoint,
             normal = normal,
@@ -48,63 +67,59 @@ case class BidirectionalTracer(camera: Camera,
             toNextNode = brdfResult.sample,
             throughput = nextThroughput
           )
-          next :: generatePath(hitPoint, brdfResult.sample, nextThroughput * (1 / p))
-        } else Nil
-      case Nohit(_) => Nil
+          generatePath(hitPoint, brdfResult.sample, nextThroughput * (1 / p), next :: result)
+        } else result
+    }
+  }
+
+  def evaluate(eyePath: Path): Color = {
+    eyePath match {
+      case Nil => BLACK
+      case node :: tail => node.material.emission * node.throughput + evaluate(tail)
     }
   }
 
   def connectPaths(eyePath: Path, lightPath: Path): Color = {
     val (ne, nl) = (eyePath.length, lightPath.length)
     val totalNodes = ne * nl * (2 + ne + nl) / 2
-    var totalWeight = 0.0
+    val pathLengthNormalizer = 1.0 / totalNodes
+    val weightNormalizer = 1.0 / (ne * nl - 1)
 
-    case class PathResult(contribution: Color, weight: Double)
-
-    def loopEyePath(eyePath: Path, lightPath: Path): List[PathResult] = {
+    def loopEyePath(eyePath: Path, lightPath: Path): Color = {
       eyePath match {
-        case Nil =>
-          Nil
+        case Nil => BLACK
         case _ :: tail =>
-          loopLightPath(eyePath, lightPath) ::: loopEyePath(tail, lightPath)
+          loopLightPath(eyePath, lightPath) + loopEyePath(tail, lightPath)
       }
     }
 
-    def loopLightPath(eyePath: Path, lightPath: Path): List[PathResult] = {
+    def loopLightPath(eyePath: Path, lightPath: Path): Color = {
       lightPath match {
-        case Nil =>
-          Nil
+        case Nil => BLACK
         case _ :: tail =>
-          evaluate(eyePath, lightPath) :: loopLightPath(eyePath, tail)
+          evaluate(eyePath, lightPath) + loopLightPath(eyePath, tail)
       }
     }
 
-    def evaluate(eyePath: Path, lightPath: Path): PathResult = {
+    def evaluate(eyePath: Path, lightPath: Path): Color = {
       val pathLength = eyePath.length + lightPath.length
-      val weight = 1 - (1.0 * pathLength / totalNodes)
-      totalWeight += weight
+      val weight = (1 - pathLength * pathLengthNormalizer) * weightNormalizer
 
       (eyePath, lightPath) match {
+        case _ => BLACK
         case (e1 :: eyeTail, l1 :: lightTail) =>
           val eThroughput = eyeTail match {
-            case e2 :: _ => e2.throughput
             case _ => WHITE
+            case e2 :: _ => e2.throughput
           }
           val lThroughput = lightTail match {
-            case l2 :: _ => l2.throughput
             case _ => WHITE
+            case l2 :: _ => l2.throughput
           }
-          PathResult(
-            eThroughput * lThroughput * connectNodes(e1, l1),
-            weight
-          )
+          eThroughput * lThroughput * connectNodes(e1, l1) * weight
       }
     }
-
-    loopEyePath(eyePath, lightPath).map {
-      case PathResult(contribution, weight) =>
-        contribution * (weight / totalWeight)
-    }.reduce((c1, c2) => c1 + c2)
+    loopEyePath(eyePath, lightPath)
   }
 
   def connectNodes(n1: Node, n2: Node): Color = {
