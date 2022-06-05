@@ -37,14 +37,14 @@ case class BidirectionalTracer(camera: Camera,
       val lightSample = getLightSample()
       val eyePath = generatePath(camera.location, cameraRayDirection)
 
-      eyePath match {
-        case Nil => BLACK
-        case firstHit :: _ =>
-          val lightPath = generatePath(lightSample.location, lightSample.direction)
-          if (lightPath.isEmpty)
-            BLACK
-          else
-            lightSample.emission * connectPaths(eyePath, lightPath) + firstHit.material.emission
+      if (eyePath.isEmpty)
+        BLACK
+      else {
+        val lightPath = generatePath(lightSample.location, lightSample.direction)
+        if (lightPath.isEmpty)
+          BLACK
+        else
+          lightSample.emission * connectPaths(eyePath, lightPath) + eyePath.last.material.emission
       }
     }
     samples.reduce(_ + _) * avgMultiplier
@@ -58,17 +58,18 @@ case class BidirectionalTracer(camera: Camera,
         val nextThroughput = brdfResult.albedo * throughput
         val p = max(nextThroughput.red, max(nextThroughput.green, nextThroughput.blue))
 
-        if (random() < p) {
-          val next = Node(
-            material = material,
-            location = hitPoint,
-            normal = normal,
-            toPrevNode = direction.invert,
-            toNextNode = brdfResult.sample,
-            throughput = nextThroughput
-          )
+        val next = Node(
+          material = material,
+          location = hitPoint,
+          normal = normal,
+          toPrevNode = direction.invert,
+          toNextNode = brdfResult.sample,
+          throughput = nextThroughput
+        )
+        if (random() > p)
+          next :: result
+        else
           generatePath(hitPoint, brdfResult.sample, nextThroughput * (1 / p), next :: result)
-        } else result
     }
   }
 
@@ -106,7 +107,6 @@ case class BidirectionalTracer(camera: Camera,
       val weight = (1 - pathLength * pathLengthNormalizer) * weightNormalizer
 
       (eyePath, lightPath) match {
-        case _ => BLACK
         case (e1 :: eyeTail, l1 :: lightTail) =>
           val eThroughput = eyeTail match {
             case _ => WHITE
@@ -117,6 +117,7 @@ case class BidirectionalTracer(camera: Camera,
             case l2 :: _ => l2.throughput
           }
           eThroughput * lThroughput * connectNodes(e1, l1) * weight
+        case _ => BLACK
       }
     }
     loopEyePath(eyePath, lightPath)
