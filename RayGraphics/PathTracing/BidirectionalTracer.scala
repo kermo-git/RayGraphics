@@ -82,9 +82,12 @@ case class BidirectionalTracer(camera: Camera,
 
   def connectPaths(eyePath: Path, lightPath: Path): Color = {
     val (ne, nl) = (eyePath.length, lightPath.length)
+
     val totalNodes = ne * nl * (2 + ne + nl) / 2
+    val totalWeight = ne * nl - 1
+
     val pathLengthNormalizer = 1.0 / totalNodes
-    val weightNormalizer = 1.0 / (ne * nl - 1)
+    val weightNormalizer = 1.0 / totalWeight
 
     def loopEyePath(eyePath: Path, lightPath: Path): Color = {
       eyePath match {
