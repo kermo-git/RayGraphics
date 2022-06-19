@@ -12,9 +12,9 @@ import SampleTextures.CLOUDS
 
 object TestBidirectionalTracing {
   def scene(): Renderable = {
-    val lightCenter: Vec3 = Vec3(-5, -1, 20)
-    val lightRadius: Double = 4
-    val lightColor: Color = WHITE * 10
+    val lightCenter: Vec3 = Vec3(-5, 0, 25)
+    val lightRadius: Double = 2
+    val lightColor: Color = WHITE * 100
     val lightSurfaceArea = 4 * Pi * lightRadius * lightRadius
 
     def getLightSample(): LightSample = {
@@ -33,15 +33,21 @@ object TestBidirectionalTracing {
       center = lightCenter,
       radius = lightRadius,
       material = Lambert(
-        color = WHITE,
+        color = MEDIUM_SLATE_BLUE,
         emission = lightColor
       )
+    )
+
+    val ball = Sphere(
+      center = Vec3(5, -3, 20),
+      radius = 4,
+      material = Lambert(SEAGREEN)
     )
 
     val room = Box(
       lenX = 20, lenZ = 30, lenY = 15,
       transformation = new Transformation(0, 0, 14),
-      material = Lambert(MEDIUM_SLATE_BLUE)
+      material = Lambert(LIGHT_GRAY)
     )
 
     BidirectionalTracer(
@@ -50,7 +56,7 @@ object TestBidirectionalTracing {
       getLightSample = getLightSample,
       scene = RayTracingScene(
         background = scaleTexture(CLOUDS, 4),
-        shapes = List(room, lightSource),
+        shapes = List(room, lightSource, ball),
       )
     )
   }
