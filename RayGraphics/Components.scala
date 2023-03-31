@@ -85,4 +85,43 @@ object Components {
       Vec3(gradX, gradY, gradZ).normalize
     }
   }
+
+  trait OriginShape[+M] extends Shape[M] {
+    val transformation: Transformation
+
+    def getNormalAtOrigin(point: Vec3): Vec3
+
+    override def getNormal(point: Vec3): Vec3 = {
+      getNormalAtOrigin(
+        point * transformation.fullInverse
+      ) * transformation.rotation
+    }
+  }
+
+  trait OriginRTShape[+M] extends OriginShape[M] with RTShape[M] {
+    def getRayHitDistAtOrigin(origin: Vec3, direction: Vec3): Option[Double]
+
+    override def getRayHitDist(origin: Vec3, direction: Vec3): Option[Double] = {
+      getRayHitDistAtOrigin(
+        origin * transformation.fullInverse,
+        direction * transformation.rotationInverse
+      )
+    }
+  }
+
+  trait OriginRMShape[+M] extends OriginShape[M] with RMShape[M] {
+    def getDistanceAtOrigin(point: Vec3): Double
+
+    override def getDistance(point: Vec3): Double = {
+      getDistanceAtOrigin(point * transformation.fullInverse)
+    }
+
+    override def getNormalAtOrigin(point: Vec3): Vec3 = {
+      val gradX = getDistanceAtOrigin(point - incX) - getDistanceAtOrigin(point + incX)
+      val gradY = getDistanceAtOrigin(point - incY) - getDistanceAtOrigin(point + incY)
+      val gradZ = getDistanceAtOrigin(point - incZ) - getDistanceAtOrigin(point + incZ)
+
+      Vec3(gradX, gradY, gradZ).normalize
+    }
+  }
 }

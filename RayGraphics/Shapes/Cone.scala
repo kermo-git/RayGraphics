@@ -8,29 +8,25 @@ import RayGraphics.Components._
 case class Cone[M](height: Double,
                    radius: Double,
                    transformation: Transformation,
-                   material: M) extends RTShape[M] with RMShape[M] {
+                   material: M) extends OriginRTShape[M] with OriginRMShape[M] {
 
   private val normalTan = radius / height
 
-  override def getNormal(point: Vec3): Vec3 = {
-    val t = point * transformation.fullInverse
-
-    val normal = if (t.y - SURFACE_BIAS < 0) UNIT_Y else {
-      val radiusVec = Vec3(t.x, 0, t.z).normalize
+  override def getNormalAtOrigin(point: Vec3): Vec3 = {
+    val normal = if (point.y - SURFACE_BIAS < 0) UNIT_Y else {
+      val radiusVec = Vec3(point.x, 0, point.z).normalize
       Vec3(radiusVec.x, normalTan, radiusVec.z).normalize
     }
-    normal * transformation.rotation
+    normal
   }
 
   private val k = -height / radius
   private val krec = -radius / height
   private val k_krec = k + krec
 
-  override def getDistance(point: Vec3): Double = {
-    val t = point * transformation.fullInverse
-
-    val xp = Vec3(t.x, 0, t.z).length
-    val yp = t.y
+  override def getDistanceAtOrigin(point: Vec3): Double = {
+    val xp = Vec3(point.x, 0, point.z).length
+    val yp = point.y
     val p = Vec3(xp, yp, 0)
 
     val xc = (yp + krec * xp - height) / k_krec
@@ -63,11 +59,7 @@ case class Cone[M](height: Double,
     }
   }
 
-  override def getRayHitDist(worldOrigin: Vec3, worldDirection: Vec3): Option[Double] = {
-    val (origin, direction) = (
-      worldOrigin * transformation.fullInverse,
-      worldDirection * transformation.rotationInverse
-    )
+  override def getRayHitDistAtOrigin(origin: Vec3, direction: Vec3): Option[Double] = {
     val coneHit: Option[Double] = getConeHitDist(origin, direction)
 
     val bottomDist = -origin.y / direction.y

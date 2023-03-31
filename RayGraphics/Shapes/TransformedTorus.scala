@@ -2,7 +2,7 @@ package RayGraphics.Shapes
 
 import scala.math.{abs, max, sqrt}
 
-import RayGraphics.Components.RMShape
+import RayGraphics.Components.OriginRMShape
 import RayGraphics.Geometry.{Transformation, Vec3, rotateAroundY}
 
 case class TransformedTorus[M](mainRadius: Double,
@@ -16,9 +16,10 @@ case class TransformedTorus[M](mainRadius: Double,
                                transformation: Transformation,
                                stepScale: Double = 0.5,
                                material: M
-                        ) extends RMShape[M] {
+                        ) extends OriginRMShape[M] {
 
-  override def getDistance(point: Vec3): Double = stepScale * getTorusDistance(elongate(twist(point * transformation.fullInverse)))
+  override def getDistanceAtOrigin(point: Vec3): Double =
+    stepScale * getTorusDistance(elongate(twist(point)))
 
   def getTorusDistance(point: Vec3): Double = {
     val x = Vec3(point.x, 0, point.z).length - mainRadius

@@ -59,7 +59,7 @@ object Main {
 
     val startTime = System.nanoTime
 
-    renderImage(TestBidirectionalTracing.scene).onComplete {
+    renderImage(SampleScenes.pathTracingWithRayMarching).onComplete {
       case Success(image) =>
         val duration: Double = System.nanoTime - startTime
         println("Rendering took " + duration / 1e9 + " seconds")

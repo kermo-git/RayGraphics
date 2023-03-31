@@ -9,7 +9,7 @@ case class Box[M](lenX: Double,
                   lenY: Double,
                   lenZ: Double,
                   transformation: Transformation,
-                  material: M) extends RTShape[M] with RMShape[M] {
+                  material: M) extends OriginRTShape[M] with OriginRMShape[M] {
 
   private val (maxX, maxY, maxZ, minX, minY, minZ) = (
      0.5 * lenX,
@@ -20,22 +20,16 @@ case class Box[M](lenX: Double,
     -0.5 * lenZ
   )
 
-  override def getNormal(point: Vec3): Vec3 = {
-    val t = point * transformation.fullInverse
-
-    val absX = abs(t.x) + SURFACE_BIAS
-    val absZ = abs(t.z) + SURFACE_BIAS
-    val normal = if (absX < maxX) { if (absZ < maxZ) UNIT_Y else UNIT_Z } else UNIT_X
-
-    normal * transformation.rotation
+  override def getNormalAtOrigin(point: Vec3): Vec3 = {
+    val absX = abs(point.x) + SURFACE_BIAS
+    val absZ = abs(point.z) + SURFACE_BIAS
+    if (absX < maxX) { if (absZ < maxZ) UNIT_Y else UNIT_Z } else UNIT_X
   }
 
-  override def getDistance(point: Vec3): Double = {
-    val t = point * transformation.fullInverse
-
-    val distX = abs(t.x) - maxX
-    val distY = abs(t.y) - maxY
-    val distZ = abs(t.z) - maxZ
+  override def getDistanceAtOrigin(point: Vec3): Double = {
+    val distX = abs(point.x) - maxX
+    val distY = abs(point.y) - maxY
+    val distZ = abs(point.z) - maxZ
 
     if (distX < 0 && distY < 0 && distZ < 0)
       max(distX, max(distZ, distY))
@@ -47,12 +41,7 @@ case class Box[M](lenX: Double,
       )
   }
 
-  override def getRayHitDist(worldOrigin: Vec3, worldDirection: Vec3): Option[Double] = {
-    val (origin, direction) = (
-      worldOrigin * transformation.fullInverse,
-      worldDirection * transformation.rotationInverse
-    )
-
+  override def getRayHitDistAtOrigin(origin: Vec3, direction: Vec3): Option[Double] = {
     val x1 = (minX - origin.x) / direction.x
     val x2 = (maxX - origin.x) / direction.x
 

@@ -8,27 +8,21 @@ import RayGraphics.Components._
 case class Cylinder[M](height: Double,
                        radius: Double,
                        transformation: Transformation,
-                       material: M = null) extends RTShape[M] with RMShape[M] {
+                       material: M = null) extends OriginRTShape[M] with OriginRMShape[M] {
 
   private val (rSqr, minY, maxY) = (radius * radius, -0.5 * height, 0.5 * height)
 
-  override def getNormal(point: Vec3): Vec3 = {
-    val t = point * transformation.fullInverse
-
+  override def getNormalAtOrigin(point: Vec3): Vec3 = {
     val normal =
-      if (t.y - SURFACE_BIAS < minY || t.y + SURFACE_BIAS > maxY)
+      if (point.y - SURFACE_BIAS < minY || point.y + SURFACE_BIAS > maxY)
         UNIT_Y
       else
-        Vec3(t.x, 0, t.z).normalize
+        Vec3(point.x, 0, point.z).normalize
 
-    normal * transformation.rotation
+    normal
   }
 
-  override def getRayHitDist(worldOrigin: Vec3, worldDirection: Vec3): Option[Double] = {
-    val (origin, direction) = (
-      worldOrigin * transformation.fullInverse,
-      worldDirection * transformation.rotationInverse
-    )
+  override def getRayHitDistAtOrigin(origin: Vec3, direction: Vec3): Option[Double] = {
     val a = direction.x * direction.x + direction.z * direction.z
     val b = 2 * (origin.x * direction.x + origin.z * direction.z)
     val c = origin.x * origin.x + origin.z * origin.z - rSqr
@@ -69,11 +63,9 @@ case class Cylinder[M](height: Double,
     }
   }
 
-  override def getDistance(point: Vec3): Double = {
-    val t = point * transformation.fullInverse
-
-    val capDistance = abs(t.y) - maxY
-    val cylinderDistance = Vec3(t.x, 0, t.z).length - radius
+  override def getDistanceAtOrigin(point: Vec3): Double = {
+    val capDistance = abs(point.y) - maxY
+    val cylinderDistance = Vec3(point.x, 0, point.z).length - radius
 
     val inInfiniteCylinder = cylinderDistance < 0
     val betweenCaps = capDistance < 0
