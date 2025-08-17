@@ -6,38 +6,38 @@ object Geometry {
   type Matrix = Array[Array[Double]]
 
   val IDENTITY_MATRIX: Matrix = Array(
-    Array(1, 0, 0, 0),
-    Array(0, 1, 0, 0),
-    Array(0, 0, 1, 0),
-    Array(0, 0, 0, 1),
+    Array(1.0, 0.0, 0.0, 0.0),
+    Array(0.0, 1.0, 0.0, 0.0),
+    Array(0.0, 0.0, 1.0, 0.0),
+    Array(0.0, 0.0, 0.0, 1.0),
   )
 
   def rotateAroundX(rad: Double): Matrix = Array(
-    Array(1,  0,        0,        0),
-    Array(0,  cos(rad), sin(rad), 0),
-    Array(0, -sin(rad), cos(rad), 0),
-    Array(0,  0,        0,        1),
+    Array(1.0,  0.0,      0.0,      0.0),
+    Array(0.0,  cos(rad), sin(rad), 0.0),
+    Array(0.0, -sin(rad), cos(rad), 0.0),
+    Array(0.0,  0.0,      0.0,      1.0),
   )
 
   def rotateAroundY(rad: Double): Matrix = Array(
-    Array(cos(rad), 0, -sin(rad), 0),
-    Array(0,        1,  0,        0),
-    Array(sin(rad), 0,  cos(rad), 0),
-    Array(0,        0,  0,        1),
+    Array(cos(rad), 0.0, -sin(rad), 0.0),
+    Array(0.0,      1.0,  0.0,      0.0),
+    Array(sin(rad), 0.0,  cos(rad), 0.0),
+    Array(0.0,      0.0,  0.0,      1.0),
   )
 
   def rotateAroundZ(rad: Double): Matrix = Array(
-    Array( cos(rad), sin(rad), 0, 0),
-    Array(-sin(rad), cos(rad), 0, 0),
-    Array( 0,        0,        1, 0),
-    Array( 0,        0,        0, 1),
+    Array( cos(rad), sin(rad), 0.0, 0.0),
+    Array(-sin(rad), cos(rad), 0.0, 0.0),
+    Array( 0.0,      0.0,      1.0, 0.0),
+    Array( 0.0,      0.0,      0.0, 1.0),
   )
 
   def translate(x: Double, y: Double, z: Double): Matrix = Array(
-    Array(1, 0, 0, 0),
-    Array(0, 1, 0, 0),
-    Array(0, 0, 1, 0),
-    Array(x, y, z, 1),
+    Array(1.0, 0.0, 0.0, 0.0),
+    Array(0.0, 1.0, 0.0, 0.0),
+    Array(0.0, 0.0, 1.0, 0.0),
+    Array(x,   y,   z,   1.0),
   )
 
   def coordinateSystem(yAxis: Vec3): Matrix = {
@@ -49,10 +49,10 @@ object Geometry {
     val zAxis = xAxis cross yAxis
 
     Array(
-      Array(xAxis.x, xAxis.y, xAxis.z, 0),
-      Array(yAxis.x, yAxis.y, yAxis.z, 0),
-      Array(zAxis.x, zAxis.y, zAxis.z, 0),
-      Array(0,       0,       0,       1),
+      Array(xAxis.x, xAxis.y, xAxis.z, 0.0),
+      Array(yAxis.x, yAxis.y, yAxis.z, 0.0),
+      Array(zAxis.x, zAxis.y, zAxis.z, 0.0),
+      Array(0.0,     0.0,     0.0,     1.0),
     )
   }
 
@@ -73,7 +73,7 @@ object Geometry {
   }
 
   class Transformation(degX: Double, degY: Double, degZ: Double, x: Double, y: Double, z: Double) {
-    def this(x: Double, y: Double, z: Double) {
+    def this(x: Double, y: Double, z: Double) = {
       this(0, 0, 0, x, y, z)
     }
 
@@ -88,7 +88,7 @@ object Geometry {
   }
 
   case class Vec3(x: Double, y: Double, z: Double) {
-    def this(v1: Vec3, v2: Vec3) {
+    def this(v1: Vec3, v2: Vec3) = {
       this(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z)
     }
 
