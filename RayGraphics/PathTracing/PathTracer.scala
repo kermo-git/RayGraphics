@@ -1,12 +1,10 @@
 package RayGraphics.PathTracing
 
 import scala.math.{max, random}
-
-import RayGraphics._
-import Geometry._
-import RayGraphics.Color
-import LinearColors.WHITE
-import RayGraphics.Components._
+import RayGraphics.*
+import Geometry.*
+import LinearColors.{BLACK, WHITE}
+import RayGraphics.Components.*
 import PathTracing.Components.Material
 
 case class PathTracer(camera: Camera,
@@ -24,21 +22,29 @@ case class PathTracer(camera: Camera,
     samples.reduce(_ + _) * avgMultiplier
   }
 
-  def castRay(origin: Vec3, direction: Vec3, throughput: Color = WHITE): Color = {
-    scene.trace(origin, direction) match {
-      case Nohit(color) => color * throughput
-      case HitInfo(material, hitPoint, normal) =>
-        val emissionValue = throughput * material.emission
+  def castRay(origin: Vec3, direction: Vec3): Color = {
+    var result = BLACK
+    var currentThroughput = WHITE
+    var currentHitPoint = origin
+    var currentDirection = direction
 
-        val brdfResult = material.evaluate(direction.invert, normal)
-        val nextThroughput = throughput * brdfResult.albedo
+    while (true) {
+      scene.trace(currentHitPoint, currentDirection) match {
+        case Nohit(color) => return result + color * currentThroughput
+        case HitInfo(material, hitPoint, normal) =>
+          result += currentThroughput * material.emission
+          val brdfResult = material.evaluate(direction.invert, normal)
+          val nextThroughput = currentThroughput * brdfResult.albedo
 
-        val p = max(nextThroughput.red, max(nextThroughput.green, nextThroughput.blue))
+          val p = max(nextThroughput.red, max(nextThroughput.green, nextThroughput.blue))
+          if (random() > p)
+            return result
 
-        if (random() > p)
-          emissionValue
-        else
-          emissionValue + castRay(hitPoint, brdfResult.sample, nextThroughput * (1 / p))
+          currentThroughput = nextThroughput * (1 / p)
+          currentHitPoint = hitPoint
+          currentDirection = brdfResult.sample
+      }
     }
+    result
   }
 }
