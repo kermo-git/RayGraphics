@@ -28,12 +28,12 @@ object Main {
     })
   }
 
-  def imageToFile(image: BufferedImage, filePath: String): Unit = {
+  def imageToFile(image: BufferedImage, filePath: String, fileType: String = "png"): Unit = {
     import java.io.File
     import javax.imageio.ImageIO
 
     val outputfile = new File(filePath)
-    ImageIO.write(image, "jpg", outputfile)
+    ImageIO.write(image, fileType, outputfile)
   }
 
   def displayImageInWindow(image: BufferedImage): Unit = {
