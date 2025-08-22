@@ -2,12 +2,15 @@ package RayGraphics.SimpleRayTracing
 
 import RayGraphics.Geometry.Vec3
 import RayGraphics.Color
-import RayGraphics.LinearColors.BLACK
+import RayGraphics.LinearColors.{BLACK, WHITE}
 import RayGraphics.Components._
 
 object Components {
+  case class PointLight(location: Vec3, color: Color = WHITE)
+  
   case class SimpleRayTracer(camera: Camera,
                              scene: Scene[Material],
+                             lights: List[PointLight],
                              maxBounces: Int) extends Renderable {
 
     val imageWidth: Int = camera.imageWidth

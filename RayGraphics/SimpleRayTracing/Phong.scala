@@ -22,7 +22,7 @@ case class Phong(diffuse: Color = LIGHT_GRAY,
 
     val scene = renderer.scene
 
-    scene.lights.foldLeft(ambient)((color, light) => {
+    renderer.lights.foldLeft(ambient)((color, light) => {
       if (scene.visibility(hitPoint, light.location)) {
 
         val lightVec = new Vec3(hitPoint, light.location).normalize

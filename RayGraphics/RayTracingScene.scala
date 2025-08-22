@@ -8,8 +8,7 @@ import RayGraphics.LinearColors.BLACK
 import RayGraphics.Textures.Components.Texture
 
 case class RayTracingScene[M](shapes: List[RTShape[M]],
-                              background: Texture = _ => BLACK,
-                              override val lights: List[PointLight] = Nil) extends Scene[M](lights) {
+                              background: Texture = _ => BLACK) extends Scene[M] {
 
   type Shape = RTShape[M]
   type ShapeDist = Option[(Shape, Double)]

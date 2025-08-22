@@ -10,8 +10,7 @@ import RayGraphics.Textures.Components.Texture
 
 case class RayMarchingScene[M](maxDist: Double,
                                shapes: List[RMShape[M]],
-                               override val lights: List[PointLight] = Nil,
-                               background: Texture = _ => BLACK) extends Scene[M](lights) {
+                               background: Texture = _ => BLACK) extends Scene[M] {
 
   type Shape = RMShape[M]
   type ShapeDist = Option[(Shape, Double)]

@@ -16,10 +16,11 @@ object SampleScenes {
     camera = camera,
     maxBounces = 5,
 
+    lights = List(
+      PointLight(location = Vec3(-14, 14, 0))
+    ),
+
     scene = RayTracingScene(
-      lights = List(
-        PointLight(location = Vec3(-14, 14, 0))
-      ),
       shapes = List(
         Cone(height = 15, radius = 7,
           transformation = new Transformation(7, -15, 29),
@@ -46,14 +47,14 @@ object SampleScenes {
     camera = camera,
     maxBounces = 5,
 
+    lights = List(
+      PointLight(location = Vec3(40, 20, 40))
+    ),
+
     scene = RayMarchingScene(
       maxDist = 100,
 
       background = scaleTexture(CLOUDS, 7),
-
-      lights = List(
-        PointLight(location = Vec3(40, 20, 40))
-      ),
 
       shapes = List(
         NoisyShape(

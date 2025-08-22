@@ -3,7 +3,6 @@ package RayGraphics
 import scala.math.{tan, toRadians}
 
 import Geometry._
-import RayGraphics.LinearColors.WHITE
 
 object Components {
   trait Renderable {
@@ -42,9 +41,7 @@ object Components {
   case class HitInfo[M](material: M, hitPoint: Vec3, normal: Vec3) extends RayHit[M]
   case class Nohit[M](background: Color) extends RayHit[M]
 
-  case class PointLight(location: Vec3, color: Color = WHITE)
-
-  abstract class Scene[+M](val lights: List[PointLight]) {
+  abstract class Scene[+M] {
     def trace(origin: Vec3, direction: Vec3): RayHit[M]
 
     def visibility(point1: Vec3, point2: Vec3): Boolean = {
